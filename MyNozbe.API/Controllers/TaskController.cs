@@ -19,5 +19,12 @@ namespace MyNozbe.API.Controllers
         {
             return new Task("TestTask");
         }
+ 
+        [HttpPost]
+        public Task Add(string name)
+        {
+            var task = new Task(name);
+            return task;
+        }
     }
 }
