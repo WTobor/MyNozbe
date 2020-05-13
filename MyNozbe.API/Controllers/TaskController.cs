@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MyNozbe.Database;
+using MyNozbe.Database.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyNozbe.API.Controllers
 {
@@ -8,22 +12,35 @@ namespace MyNozbe.API.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ILogger<TaskController> _logger;
+        private readonly DatabaseContext _databaseContext;
 
-        public TaskController(ILogger<TaskController> logger)
+        public TaskController(ILogger<TaskController> logger, DatabaseContext databaseContext)
         {
             _logger = logger;
+            _databaseContext = databaseContext;
         }
 
         [HttpGet]
-        public Task Get()
+        public ActionResult<IEnumerable<Task>> Get()
         {
-            return new Task("TestTask");
+            return _databaseContext.Tasks.ToList();
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<Task> Get(int id)
+        {
+            return _databaseContext.Tasks.Find(id);
         }
  
         [HttpPost]
-        public Task Add(string name)
+        public ActionResult<Task> Add(string name)
         {
-            var task = new Task(name);
+            var task = new Task()
+            {
+                Name = name
+            };
+            _databaseContext.Tasks.Add(task);
+            _databaseContext.SaveChanges();
             return task;
         }
     }
