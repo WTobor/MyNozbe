@@ -43,5 +43,33 @@ namespace MyNozbe.API.Controllers
             _databaseContext.SaveChanges();
             return task;
         }
+
+        [HttpPut("close/{id}")]
+        public ActionResult MarkClosed(int id)
+        {
+            var task = _databaseContext.Tasks.Find(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+            task.IsCompleted = true;
+            _databaseContext.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpPut("open/{id}")]
+        public ActionResult MarkOpened(int id)
+        {
+            var task = _databaseContext.Tasks.Find(id);
+            if(task == null)
+            {
+                return NotFound();
+            }
+            task.IsCompleted = false;
+            _databaseContext.SaveChanges();
+
+            return NoContent();
+        }
     }
 }
