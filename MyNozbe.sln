@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNozbe.API", "MyNozbe.API\MyNozbe.API.csproj", "{0552EE52-7E2A-4CCC-8373-28CB4808F07C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0552EE52-7E2A-4CCC-8373-28CB4808F07C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0552EE52-7E2A-4CCC-8373-28CB4808F07C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0552EE52-7E2A-4CCC-8373-28CB4808F07C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0552EE52-7E2A-4CCC-8373-28CB4808F07C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {13E11215-82B3-4A8B-A528-FA6AEDC88184}
+	EndGlobalSection
+EndGlobal
