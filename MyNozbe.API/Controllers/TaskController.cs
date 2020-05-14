@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyNozbe.Database;
 using MyNozbe.Database.Models;
+using MyNozbe.Domain.Services;
 
 namespace MyNozbe.API.Controllers
 {
@@ -13,11 +14,13 @@ namespace MyNozbe.API.Controllers
     {
         private readonly DatabaseContext _databaseContext;
         private readonly ILogger<TaskController> _logger;
+        private readonly TaskService _taskService;
 
-        public TaskController(ILogger<TaskController> logger, DatabaseContext databaseContext)
+        public TaskController(ILogger<TaskController> logger, DatabaseContext databaseContext, TaskService taskService)
         {
             _logger = logger;
             _databaseContext = databaseContext;
+            _taskService = taskService;
         }
 
         [HttpGet]
@@ -53,14 +56,11 @@ namespace MyNozbe.API.Controllers
         [HttpPut("close/{id}")]
         public ActionResult MarkClosed(int id)
         {
-            var task = _databaseContext.Tasks.Find(id);
+            var task = _taskService.MarkTaskAsClosed(id);
             if (task == null)
             {
                 return NotFound();
             }
-
-            task.IsCompleted = true;
-            _databaseContext.SaveChanges();
 
             return NoContent();
         }
@@ -68,14 +68,11 @@ namespace MyNozbe.API.Controllers
         [HttpPut("open/{id}")]
         public ActionResult MarkOpened(int id)
         {
-            var task = _databaseContext.Tasks.Find(id);
+            var task = _taskService.MarkTaskAsOpened(id);
             if (task == null)
             {
                 return NotFound();
             }
-
-            task.IsCompleted = false;
-            _databaseContext.SaveChanges();
 
             return NoContent();
         }

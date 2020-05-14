@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MyNozbe.Database;
+using MyNozbe.Domain.Services;
 
 namespace MyNozbe.API
 {
@@ -26,6 +27,7 @@ namespace MyNozbe.API
                     options.UseInMemoryDatabase("myNozbeDatabase"));
 
             services.AddScoped<DatabaseContext>();
+            services.AddScoped<TaskService>();
 
             services.AddControllers();
 

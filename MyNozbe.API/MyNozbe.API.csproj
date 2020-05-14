@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyNozbe.Database\MyNozbe.Database.csproj" />
+    <ProjectReference Include="..\MyNozbe.Domain\MyNozbe.Domain.csproj" />
   </ItemGroup>
 
 

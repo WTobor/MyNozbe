@@ -55,17 +55,20 @@ namespace MyNozbe.API.E2ETests
         {
             // Arrange
             const string url = "task";
+            const string task1Name = "task1";
+            const string task2Name = "task2";
             var client = _factory.CreateClient();
-            await CreateTestTaskAsync("task1", client);
-            await CreateTestTaskAsync("task2", client);
+            await CreateTestTaskAsync(task1Name, client);
+            await CreateTestTaskAsync(task2Name, client);
 
             // Act
             var response = await client.GetAsync(url);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var tasks = await GetResult<IEnumerable<Database.Models.Task>>(response);
-            Assert.Equal(2, tasks.Count());
+            var tasks = await GetResult<List<Database.Models.Task>>(response);
+            Assert.NotNull(tasks.FirstOrDefault(x => x.Name == task1Name));
+            Assert.NotNull(tasks.FirstOrDefault(x => x.Name == task2Name));
         }
 
         [Fact]
