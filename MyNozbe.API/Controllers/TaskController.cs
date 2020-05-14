@@ -29,7 +29,13 @@ namespace MyNozbe.API.Controllers
         [HttpGet("{id}")]
         public ActionResult<Task> Get(int id)
         {
-            return _databaseContext.Tasks.Find(id);
+            var task = _databaseContext.Tasks.Find(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            return task;
         }
 
         [HttpPost]
