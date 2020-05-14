@@ -23,7 +23,7 @@ namespace MyNozbe.API
         {
             services
                 .AddDbContext<DatabaseContext>(options =>
-                options.UseInMemoryDatabase("myNozbeDatabase"));
+                    options.UseInMemoryDatabase("myNozbeDatabase"));
 
             services.AddScoped<DatabaseContext>();
 
@@ -49,17 +49,11 @@ namespace MyNozbe.API
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             app.UseSwagger();
 
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyNozbe API V1");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyNozbe API V1"); });
         }
     }
 }
