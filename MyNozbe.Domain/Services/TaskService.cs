@@ -1,5 +1,5 @@
 ﻿using MyNozbe.Database;
-using MyNozbe.Database.Models;
+using MyNozbe.Domain.Models;
 
 namespace MyNozbe.Domain.Services
 {
@@ -12,7 +12,7 @@ namespace MyNozbe.Domain.Services
             _databaseContext = databaseContext;
         }
 
-        public Task MarkTaskAsOpened(int id)
+        public TaskModel MarkTaskAsOpened(int id)
         {
             var task = _databaseContext.Tasks.Find(id);
             if (task == null)
@@ -22,10 +22,10 @@ namespace MyNozbe.Domain.Services
 
             task.IsCompleted = false;
             _databaseContext.SaveChanges();
-            return task;
+            return new TaskModel(task.Id, task.Name, task.IsCompleted);
         }
 
-        public Task MarkTaskAsClosed(int id)
+        public TaskModel MarkTaskAsClosed(int id)
         {
             var task = _databaseContext.Tasks.Find(id);
             if (task == null)
@@ -35,7 +35,7 @@ namespace MyNozbe.Domain.Services
 
             task.IsCompleted = true;
             _databaseContext.SaveChanges();
-            return task;
+            return new TaskModel(task.Id, task.Name, task.IsCompleted);
         }
     }
 }
