@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using Xunit;
@@ -33,11 +34,11 @@ namespace MyNozbe.API.E2ETests
             await client.PostAsync(url, null);
         }
 
-        [Fact]
-        public async Task Create_ShouldAddTaskAsync()
+        [Theory]
+        [AutoData]
+        public async Task Create_ShouldAddTaskAsync(string taskName)
         {
             // Arrange
-            const string taskName = "TestTask";
             var url = $"task?name={taskName}";
             var client = _factory.CreateClient();
 
@@ -50,13 +51,12 @@ namespace MyNozbe.API.E2ETests
             Assert.Equal(taskName, task.Name);
         }
 
-        [Fact]
-        public async Task GetWithoutParameter_ShouldReturnAllTasksAsync()
+        [Theory]
+        [AutoData]
+        public async Task GetWithoutParameter_ShouldReturnAllTasksAsync(string task1Name, string task2Name)
         {
             // Arrange
             const string url = "task";
-            const string task1Name = "task1";
-            const string task2Name = "task2";
             var client = _factory.CreateClient();
             await CreateTestTaskAsync(task1Name, client);
             await CreateTestTaskAsync(task2Name, client);
