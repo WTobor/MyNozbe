@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -46,7 +47,8 @@ namespace MyNozbe.API.Controllers
         {
             var task = new Task
             {
-                Name = name
+                Name = name,
+                CreationDateTime = DateTimeOffset.Now
             };
             _databaseContext.Tasks.Add(task);
             _databaseContext.SaveChanges();

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyNozbe.Database.Models
 {
@@ -12,5 +13,7 @@ namespace MyNozbe.Database.Models
 
         [Required]
         public bool IsCompleted { get; set; }
+
+        public DateTimeOffset CreationDateTime { get; set; }
     }
 }
