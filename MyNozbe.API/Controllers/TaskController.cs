@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyNozbe.Database;
 using MyNozbe.Database.Models;
+using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Services;
 
 namespace MyNozbe.API.Controllers
@@ -43,15 +43,9 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Task> Add(string name)
+        public ActionResult<TaskModel> Add(string name)
         {
-            var task = new Task
-            {
-                Name = name,
-                CreationDateTime = DateTimeOffset.Now
-            };
-            _databaseContext.Tasks.Add(task);
-            _databaseContext.SaveChanges();
+            var task = _taskService.AddTask(name);
             return task;
         }
 

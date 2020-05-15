@@ -1,4 +1,6 @@
-﻿using MyNozbe.Database;
+﻿using System;
+using MyNozbe.Database;
+using MyNozbe.Database.Models;
 using MyNozbe.Domain.Models;
 
 namespace MyNozbe.Domain.Services
@@ -10,6 +12,19 @@ namespace MyNozbe.Domain.Services
         public TaskService(DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;
+        }
+
+        public TaskModel AddTask(string name)
+        {
+            var task = new Task
+            {
+                Name = name,
+                CreationDateTime = DateTimeOffset.Now
+            };
+            _databaseContext.Tasks.Add(task);
+            _databaseContext.SaveChanges();
+
+            return new TaskModel(task.Id, task.Name, task.IsCompleted);
         }
 
         public TaskModel MarkTaskAsOpened(int id)
