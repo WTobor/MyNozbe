@@ -49,6 +49,18 @@ namespace MyNozbe.API.Controllers
             return task;
         }
 
+        [HttpPut("rename/{id}&&{name}")]
+        public ActionResult Rename(int id, string name)
+        {
+            var task = _taskService.Rename(id, name);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+
         [HttpPut("close/{id}")]
         public ActionResult MarkClosed(int id)
         {

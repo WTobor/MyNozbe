@@ -71,13 +71,14 @@ namespace MyNozbe.API.E2ETests
             Assert.NotNull(tasks.FirstOrDefault(x => x.Name == task2Name));
         }
 
-        [Fact]
-        public async Task GetWithParameter_ShouldReturnTaskAsync()
+        [Theory]
+        [AutoData]
+        public async Task GetWithParameter_ShouldReturnTaskAsync(string taskName)
         {
             // Arrange
             var url = $"task/{TaskId}";
             var client = _factory.CreateClient();
-            await CreateTestTaskAsync("task1", client);
+            await CreateTestTaskAsync(taskName, client);
 
             // Act
             var response = await client.GetAsync(url);
@@ -86,6 +87,69 @@ namespace MyNozbe.API.E2ETests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var task = await GetResult<Database.Models.Task>(response);
             Assert.Equal(TaskId, task.Id);
+        }
+
+        [Theory]
+        [AutoData]
+        public async Task MarkClosed_ShouldChangeIsCompletedToTrueAsync(string taskName)
+        {
+            // Arrange
+            var url = $"task/close/{TaskId}";
+            var client = _factory.CreateClient();
+            await CreateTestTaskAsync(taskName, client);
+
+            // Act
+            var operationResponse = await client.PutAsync(url, null);
+            var taskResponse = await client.GetAsync($"task/{TaskId}");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
+
+            var task = await GetResult<Database.Models.Task>(taskResponse);
+            Assert.Equal(TaskId, task.Id);
+            Assert.True(task.IsCompleted);
+        }
+
+        [Theory]
+        [AutoData]
+        public async Task MarkOpened_ShouldChangeIsCompletedToFalseAsync(string taskName)
+        {
+            // Arrange
+            var url = $"task/open/{TaskId}";
+            var client = _factory.CreateClient();
+            await CreateTestTaskAsync(taskName, client);
+
+            // Act
+            var operationResponse = await client.PutAsync(url, null);
+            var taskResponse = await client.GetAsync($"task/{TaskId}");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
+
+            var task = await GetResult<Database.Models.Task>(taskResponse);
+            Assert.Equal(TaskId, task.Id);
+            Assert.False(task.IsCompleted);
+        }
+
+        [Theory]
+        [AutoData]
+        public async Task Rename_ShouldChangeNameToNewOneAsync(string taskName, string newTaskName)
+        {
+            // Arrange
+            var url = $"task/rename/{TaskId}&&{newTaskName}";
+            var client = _factory.CreateClient();
+            await CreateTestTaskAsync(taskName, client);
+
+            // Act
+            var operationResponse = await client.PutAsync(url, null);
+            var taskResponse = await client.GetAsync($"task/{TaskId}");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
+
+            var task = await GetResult<Database.Models.Task>(taskResponse);
+            Assert.Equal(TaskId, task.Id);
+            Assert.Equal(newTaskName, task.Name);
         }
 
         [Fact]
@@ -103,26 +167,6 @@ namespace MyNozbe.API.E2ETests
         }
 
         [Fact]
-        public async Task MarkClosed_ShouldChangeIsCompletedToTrueAsync()
-        {
-            // Arrange
-            var url = $"task/close/{TaskId}";
-            var client = _factory.CreateClient();
-            await CreateTestTaskAsync("task1", client);
-
-            // Act
-            var operationResponse = await client.PutAsync(url, null);
-            var taskResponse = await client.GetAsync($"task/{TaskId}");
-
-            // Assert
-            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
-
-            var task = await GetResult<Database.Models.Task>(taskResponse);
-            Assert.Equal(TaskId, task.Id);
-            Assert.True(task.IsCompleted);
-        }
-
-        [Fact]
         public async Task MarkClosedNotExistingTask_ShouldReturnNotFoundAsync()
         {
             // Arrange
@@ -137,30 +181,24 @@ namespace MyNozbe.API.E2ETests
         }
 
         [Fact]
-        public async Task MarkOpened_ShouldChangeIsCompletedToFalseAsync()
-        {
-            // Arrange
-            var url = $"task/open/{TaskId}";
-            var client = _factory.CreateClient();
-            await CreateTestTaskAsync("task1", client);
-
-            // Act
-            var operationResponse = await client.PutAsync(url, null);
-            var taskResponse = await client.GetAsync($"task/{TaskId}");
-
-            // Assert
-            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
-
-            var task = await GetResult<Database.Models.Task>(taskResponse);
-            Assert.Equal(TaskId, task.Id);
-            Assert.False(task.IsCompleted);
-        }
-
-        [Fact]
         public async Task MarkOpenedNotExistingTask_ShouldReturnNotFoundAsync()
         {
             // Arrange
             var url = $"task/open/{NotExistingTaskId}";
+            var client = _factory.CreateClient();
+
+            // Act
+            var response = await client.PutAsync(url, null);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task RenameNotExistingTask_ShouldReturnNotFoundAsync()
+        {
+            // Arrange
+            var url = $"task/rename/{NotExistingTaskId}&&test";
             var client = _factory.CreateClient();
 
             // Act

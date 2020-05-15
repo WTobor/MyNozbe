@@ -16,7 +16,7 @@
 
         public int Id { get; }
 
-        public string Name { get; }
+        public string Name { get; private set; }
 
         public bool IsCompleted { get; private set; }
 
@@ -28,6 +28,11 @@
         public void MarkAsClosed()
         {
             IsCompleted = true;
+        }
+
+        public void Rename(string name)
+        {
+            Name = name;
         }
     }
 }

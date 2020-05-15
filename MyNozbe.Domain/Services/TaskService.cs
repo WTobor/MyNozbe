@@ -45,5 +45,18 @@ namespace MyNozbe.Domain.Services
             _taskModelDbOperations.Update(taskModel);
             return taskModel;
         }
+
+        public object Rename(int taskId, string name)
+        {
+            var taskModel = _taskModelDbOperations.Get(taskId);
+            if (taskModel == null)
+            {
+                return null;
+            }
+
+            taskModel.Rename(name);
+            _taskModelDbOperations.Update(taskModel);
+            return taskModel;
+        }
     }
 }
