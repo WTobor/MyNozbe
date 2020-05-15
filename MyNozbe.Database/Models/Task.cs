@@ -5,6 +5,13 @@ namespace MyNozbe.Database.Models
 {
     public class Task
     {
+        public Task(string name, DateTimeOffset creationDateTime, bool isCompleted = false)
+        {
+            Name = name;
+            CreationDateTime = creationDateTime;
+            IsCompleted = isCompleted;
+        }
+
         [Key]
         public int Id { get; set; }
 
@@ -14,6 +21,7 @@ namespace MyNozbe.Database.Models
         [Required]
         public bool IsCompleted { get; set; }
 
+        [Required]
         public DateTimeOffset CreationDateTime { get; set; }
     }
 }

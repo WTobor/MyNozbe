@@ -1,56 +1,49 @@
-﻿using System;
-using MyNozbe.Database;
-using MyNozbe.Database.Models;
+﻿using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
 
 namespace MyNozbe.Domain.Services
 {
     public class TaskService
     {
-        private readonly DatabaseContext _databaseContext;
+        private readonly IDbOperations<TaskModel> _taskModelDbOperations;
 
-        public TaskService(DatabaseContext databaseContext)
+        public TaskService(IDbOperations<TaskModel> taskModelDbOperations)
         {
-            _databaseContext = databaseContext;
+            this._taskModelDbOperations = taskModelDbOperations;
         }
 
         public TaskModel AddTask(string name)
         {
-            var task = new Task
-            {
-                Name = name,
-                CreationDateTime = DateTimeOffset.Now
-            };
-            _databaseContext.Tasks.Add(task);
-            _databaseContext.SaveChanges();
+            var taskModel = new TaskModel(name);
+            taskModel = _taskModelDbOperations.Create(taskModel);
 
-            return new TaskModel(task.Id, task.Name, task.IsCompleted);
+            return taskModel;
         }
 
-        public TaskModel MarkTaskAsOpened(int id)
+        public TaskModel MarkTaskAsOpened(int taskId)
         {
-            var task = _databaseContext.Tasks.Find(id);
-            if (task == null)
+            var taskModel = _taskModelDbOperations.Get(taskId);
+            if (taskModel == null)
             {
                 return null;
             }
 
-            task.IsCompleted = false;
-            _databaseContext.SaveChanges();
-            return new TaskModel(task.Id, task.Name, task.IsCompleted);
+            taskModel.MarkAsOpened();
+            _taskModelDbOperations.Update(taskModel);
+            return taskModel;
         }
 
-        public TaskModel MarkTaskAsClosed(int id)
+        public TaskModel MarkTaskAsClosed(int taskId)
         {
-            var task = _databaseContext.Tasks.Find(id);
-            if (task == null)
+            var taskModel = _taskModelDbOperations.Get(taskId);
+            if (taskModel == null)
             {
                 return null;
             }
 
-            task.IsCompleted = true;
-            _databaseContext.SaveChanges();
-            return new TaskModel(task.Id, task.Name, task.IsCompleted);
+            taskModel.MarkAsClosed();
+            _taskModelDbOperations.Update(taskModel);
+            return taskModel;
         }
     }
 }

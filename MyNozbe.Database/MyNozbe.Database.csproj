@@ -12,4 +12,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyNozbe.Domain\MyNozbe.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
