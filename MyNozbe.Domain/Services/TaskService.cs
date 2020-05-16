@@ -1,5 +1,7 @@
-﻿using MyNozbe.Domain.Interfaces;
+﻿using System.Linq;
+using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
+using MyNozbe.Domain.Validators;
 
 namespace MyNozbe.Domain.Services
 {
@@ -9,54 +11,78 @@ namespace MyNozbe.Domain.Services
 
         public TaskService(IDbOperations<TaskModel> taskModelDbOperations)
         {
-            this._taskModelDbOperations = taskModelDbOperations;
+            _taskModelDbOperations = taskModelDbOperations;
         }
 
-        public TaskModel AddTask(string name)
+        public OperationResult<TaskModel> AddTask(string name)
         {
             var taskModel = new TaskModel(name);
-            taskModel = _taskModelDbOperations.Create(taskModel);
+            var validationErrors = GetValidationErrors(taskModel);
+            if (!string.IsNullOrEmpty(validationErrors))
+            {
+                return new OperationResult<TaskModel>(validationErrors, OperationResultStatus.ValidationFailed);
+            }
 
-            return taskModel;
+            taskModel = _taskModelDbOperations.Create(taskModel);
+            return new OperationResult<TaskModel>(taskModel);
         }
 
-        public TaskModel MarkTaskAsOpened(int taskId)
+        public OperationResult<TaskModel> MarkTaskAsOpened(int taskId)
         {
             var taskModel = _taskModelDbOperations.Get(taskId);
             if (taskModel == null)
             {
-                return null;
+                return new OperationResult<TaskModel>(OperationResultStatus.NotFound);
             }
 
             taskModel.MarkAsOpened();
             _taskModelDbOperations.Update(taskModel);
-            return taskModel;
+            return new OperationResult<TaskModel>(taskModel);
         }
 
-        public TaskModel MarkTaskAsClosed(int taskId)
+        public OperationResult<TaskModel> MarkTaskAsClosed(int taskId)
         {
             var taskModel = _taskModelDbOperations.Get(taskId);
             if (taskModel == null)
             {
-                return null;
+                return new OperationResult<TaskModel>(OperationResultStatus.NotFound);
             }
 
             taskModel.MarkAsClosed();
             _taskModelDbOperations.Update(taskModel);
-            return taskModel;
+            return new OperationResult<TaskModel>(taskModel);
         }
 
-        public object Rename(int taskId, string name)
+        public OperationResult<TaskModel> Rename(int taskId, string name)
         {
             var taskModel = _taskModelDbOperations.Get(taskId);
             if (taskModel == null)
             {
-                return null;
+                return new OperationResult<TaskModel>(OperationResultStatus.NotFound);
             }
 
             taskModel.Rename(name);
+
+            var validationErrors = GetValidationErrors(taskModel);
+            if (!string.IsNullOrEmpty(validationErrors))
+            {
+                return new OperationResult<TaskModel>(validationErrors, OperationResultStatus.ValidationFailed);
+            }
+
             _taskModelDbOperations.Update(taskModel);
-            return taskModel;
+            return new OperationResult<TaskModel>(OperationResultStatus.Ok);
+        }
+
+        private static string GetValidationErrors(TaskModel taskModel)
+        {
+            var validator = new TaskModelValidator();
+            var result = validator.Validate(taskModel);
+            if (!result.IsValid)
+            {
+                return string.Join(";", result.Errors.Select(x => x.ErrorMessage));
+            }
+
+            return string.Empty;
         }
     }
 }

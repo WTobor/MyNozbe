@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using MyNozbe.Database.Repositories;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Services;
+using MyNozbe.Domain.Validators;
 
 namespace MyNozbe.API
 {
@@ -33,7 +35,8 @@ namespace MyNozbe.API
             services.AddScoped<IDbOperations<TaskModel>, TaskRepository>();
             services.AddScoped<TaskService>();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<TaskModelValidator>());
 
             services.AddSwaggerGen(c =>
             {

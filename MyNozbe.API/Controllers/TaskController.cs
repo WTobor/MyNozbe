@@ -34,55 +34,46 @@ namespace MyNozbe.API.Controllers
         public ActionResult<Task> Get(int id)
         {
             var task = _databaseContext.Tasks.Find(id);
+            OperationResult<Task> operationResult;
             if (task == null)
             {
-                return NotFound();
+                operationResult = new OperationResult<Task>(OperationResultStatus.NotFound);
+            }
+            else
+            {
+                operationResult = new OperationResult<Task>(task);
             }
 
-            return task;
+            return new ActionResultHelper<Task>().GetActionResult(operationResult);
         }
 
         [HttpPost]
         public ActionResult<TaskModel> Add(string name)
         {
-            var task = _taskService.AddTask(name);
-            return task;
+            var taskResult = _taskService.AddTask(name);
+            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult);
         }
 
-        [HttpPut("rename/{id}&&{name}")]
-        public ActionResult Rename(int id, string name)
-        {
-            var task = _taskService.Rename(id, name);
-            if (task == null)
-            {
-                return NotFound();
-            }
 
-            return NoContent();
+        [HttpPut("rename/{id}&{name}")]
+        public ActionResult<TaskModel> Rename(int id, string name)
+        {
+            var taskResult = _taskService.Rename(id, name);
+            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
         }
 
         [HttpPut("close/{id}")]
-        public ActionResult MarkClosed(int id)
+        public ActionResult<TaskModel> MarkClosed(int id)
         {
-            var task = _taskService.MarkTaskAsClosed(id);
-            if (task == null)
-            {
-                return NotFound();
-            }
-
-            return NoContent();
+            var taskResult = _taskService.MarkTaskAsClosed(id);
+            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
         }
 
         [HttpPut("open/{id}")]
-        public ActionResult MarkOpened(int id)
+        public ActionResult<TaskModel> MarkOpened(int id)
         {
-            var task = _taskService.MarkTaskAsOpened(id);
-            if (task == null)
-            {
-                return NotFound();
-            }
-
-            return NoContent();
+            var taskResult = _taskService.MarkTaskAsOpened(id);
+            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
         }
     }
 }
