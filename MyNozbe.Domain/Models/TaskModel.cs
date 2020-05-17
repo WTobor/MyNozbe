@@ -12,6 +12,7 @@
         public TaskModel(string name)
         {
             Name = name;
+            IsCompleted = false;
         }
 
         public int Id { get; }

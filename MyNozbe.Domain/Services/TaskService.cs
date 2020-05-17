@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FluentValidation.Results;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Validators;
@@ -17,10 +19,11 @@ namespace MyNozbe.Domain.Services
         public OperationResult<TaskModel> AddTask(string name)
         {
             var taskModel = new TaskModel(name);
-            var validationErrors = GetValidationErrors(taskModel);
-            if (!string.IsNullOrEmpty(validationErrors))
+            var validator = new TaskModelValidator();
+            var result = validator.Validate(taskModel);
+            if (!result.IsValid)
             {
-                return new OperationResult<TaskModel>(validationErrors, OperationResultStatus.ValidationFailed);
+                return GetValidationFailedOperationResult(result);
             }
 
             taskModel = _taskModelDbOperations.Create(taskModel);
@@ -63,26 +66,26 @@ namespace MyNozbe.Domain.Services
 
             taskModel.Rename(name);
 
-            var validationErrors = GetValidationErrors(taskModel);
-            if (!string.IsNullOrEmpty(validationErrors))
+            var validator = new TaskModelValidator();
+            var result = validator.Validate(taskModel);
+            if (!result.IsValid)
             {
-                return new OperationResult<TaskModel>(validationErrors, OperationResultStatus.ValidationFailed);
+                return GetValidationFailedOperationResult(result);
             }
 
             _taskModelDbOperations.Update(taskModel);
             return new OperationResult<TaskModel>(OperationResultStatus.Ok);
         }
 
-        private static string GetValidationErrors(TaskModel taskModel)
+        private OperationResult<TaskModel> GetValidationFailedOperationResult(ValidationResult result)
         {
-            var validator = new TaskModelValidator();
-            var result = validator.Validate(taskModel);
-            if (!result.IsValid)
-            {
-                return string.Join(";", result.Errors.Select(x => x.ErrorMessage));
-            }
+            var validationErrors = GetValidationErrorMessage(result.Errors);
+            return new OperationResult<TaskModel>(validationErrors, OperationResultStatus.ValidationFailed);
+        }
 
-            return string.Empty;
+        private string GetValidationErrorMessage(IEnumerable<ValidationFailure> errors)
+        {
+            return string.Join(";", errors.Select(x => x.ErrorMessage));
         }
     }
 }

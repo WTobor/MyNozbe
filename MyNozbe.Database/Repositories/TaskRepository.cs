@@ -16,22 +16,16 @@ namespace MyNozbe.Database.Repositories
 
         public TaskModel Create(TaskModel model)
         {
-            var task = new Task(model.Name, DateTimeOffset.Now);
+            var task = new Task(model.Name, DateTimeOffset.Now, model.IsCompleted);
             _databaseContext.Tasks.Add(task);
             _databaseContext.SaveChanges();
-            var result = MapTaskToTaskModel(task);
-            return result;
+            return MapTaskToTaskModel(task);
         }
 
         public TaskModel Get(int taskId)
         {
             var task = _databaseContext.Tasks.Find(taskId);
-            if (task == null)
-            {
-                return null;
-            }
-
-            return new TaskModel(task.Id, task.Name, task.IsCompleted);
+            return MapTaskToTaskModel(task);
         }
 
         public void Update(TaskModel model)
@@ -44,6 +38,11 @@ namespace MyNozbe.Database.Repositories
 
         private static TaskModel MapTaskToTaskModel(Task task)
         {
+            if (task is null)
+            {
+                return null;
+            }
+
             return new TaskModel(task.Id, task.Name, task.IsCompleted);
         }
     }

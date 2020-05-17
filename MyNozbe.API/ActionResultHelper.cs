@@ -25,7 +25,7 @@ namespace MyNozbe.API
             {
                 if (returnResultObject)
                 {
-                    return operationResult.ResultObject;
+                    return Ok(operationResult.ResultObject);
                 }
 
                 return NoContent();

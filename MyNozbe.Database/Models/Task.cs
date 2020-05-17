@@ -5,7 +5,7 @@ namespace MyNozbe.Database.Models
 {
     public class Task
     {
-        public Task(string name, DateTimeOffset creationDateTime, bool isCompleted = false)
+        public Task(string name, DateTimeOffset creationDateTime, bool isCompleted)
         {
             Name = name;
             CreationDateTime = creationDateTime;

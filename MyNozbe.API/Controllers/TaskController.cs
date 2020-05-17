@@ -27,24 +27,19 @@ namespace MyNozbe.API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Task>> Get()
         {
-            return _databaseContext.Tasks.ToList();
+            return Ok(_databaseContext.Tasks.ToList());
         }
 
         [HttpGet("{id}")]
         public ActionResult<Task> Get(int id)
         {
             var task = _databaseContext.Tasks.Find(id);
-            OperationResult<Task> operationResult;
             if (task == null)
             {
-                operationResult = new OperationResult<Task>(OperationResultStatus.NotFound);
-            }
-            else
-            {
-                operationResult = new OperationResult<Task>(task);
+                return NotFound();
             }
 
-            return new ActionResultHelper<Task>().GetActionResult(operationResult);
+            return Ok(task);
         }
 
         [HttpPost]
@@ -53,7 +48,6 @@ namespace MyNozbe.API.Controllers
             var taskResult = _taskService.AddTask(name);
             return new ActionResultHelper<TaskModel>().GetActionResult(taskResult);
         }
-
 
         [HttpPut("rename/{id}&{name}")]
         public ActionResult<TaskModel> Rename(int id, string name)
