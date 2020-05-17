@@ -11,29 +11,17 @@ using Xunit;
 
 namespace MyNozbe.API.E2ETests
 {
-    public class TaskControllerTest : IClassFixture<WebApplicationFactory<Startup>>
+    public class TaskControllerTest : IClassFixture<CustomWebApplicationFactory>
     {
-        public TaskControllerTest(WebApplicationFactory<Startup> factory)
+        public TaskControllerTest(CustomWebApplicationFactory factory)
         {
             _factory = factory;
         }
 
-        private readonly WebApplicationFactory<Startup> _factory;
         private const int TaskId = 1;
         private const int NotExistingTaskId = 9999;
 
-        private static async Task<T> GetResult<T>(HttpResponseMessage response)
-        {
-            var stringResponse = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<T>(stringResponse);
-            return result;
-        }
-
-        private static async Task CreateTestTaskAsync(string name, HttpClient client)
-        {
-            var url = $"task?name={name}";
-            await client.PostAsync(url, null);
-        }
+        private readonly WebApplicationFactory<Startup> _factory;
 
         [Theory]
         [AutoData]
@@ -185,6 +173,36 @@ namespace MyNozbe.API.E2ETests
             Assert.Equal(newTaskName, taskResult.Name);
         }
 
+        [Theory]
+        [AutoData]
+        public async Task RenameWithTooLongName_ShouldFailAsync([MaxLength(30)] string taskName,
+            [MinLength(31)] string newTaskName)
+        {
+            // Arrange
+            var url = $"task/rename/{TaskId}&{newTaskName}";
+            var client = _factory.CreateClient();
+            await CreateTestTaskAsync(taskName, client);
+
+            // Act
+            var response = await client.PutAsync(url, null);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        private static async Task<T> GetResult<T>(HttpResponseMessage response)
+        {
+            var stringResponse = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<T>(stringResponse);
+            return result;
+        }
+
+        private static async Task CreateTestTaskAsync(string name, HttpClient client)
+        {
+            var url = $"task?name={name}";
+            await client.PostAsync(url, null);
+        }
+
         [Fact]
         public async Task GetWithParameterNotExistingTask_ShouldReturnNotFoundAsync()
         {
@@ -239,22 +257,6 @@ namespace MyNozbe.API.E2ETests
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [Theory]
-        [AutoData]
-        public async Task RenameWithTooLongName_ShouldFailAsync([MaxLength(30)] string taskName, [MinLength(31)] string newTaskName)
-        {
-            // Arrange
-            var url = $"task/rename/{TaskId}&{newTaskName}";
-            var client = _factory.CreateClient();
-            await CreateTestTaskAsync(taskName, client);
-
-            // Act
-            var response = await client.PutAsync(url, null);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
     }
 }
