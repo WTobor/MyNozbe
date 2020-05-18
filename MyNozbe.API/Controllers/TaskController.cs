@@ -25,7 +25,7 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Task>> Get()
+        public ActionResult<IEnumerable<Task>> GetAll()
         {
             return Ok(_databaseContext.Tasks.ToList());
         }

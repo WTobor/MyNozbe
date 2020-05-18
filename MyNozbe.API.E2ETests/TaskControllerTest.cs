@@ -13,8 +13,6 @@ namespace MyNozbe.API.E2ETests
 {
     public class TaskControllerTest : IClassFixture<CustomWebApplicationFactory>
     {
-        private const int NotExistingTaskId = 9999;
-
         private readonly WebApplicationFactory<Startup> _factory;
 
         public TaskControllerTest(CustomWebApplicationFactory factory)
@@ -180,7 +178,7 @@ namespace MyNozbe.API.E2ETests
         public async Task Get_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
-            var url = $"task/{NotExistingTaskId}";
+            var url = "task/-1";
             var client = _factory.CreateClient();
 
             // Act
@@ -194,7 +192,7 @@ namespace MyNozbe.API.E2ETests
         public async Task MarkClosed_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
-            var url = $"task/{NotExistingTaskId}/close";
+            var url = "task/-1/close";
             var client = _factory.CreateClient();
 
             // Act
@@ -208,7 +206,7 @@ namespace MyNozbe.API.E2ETests
         public async Task MarkOpened_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
-            var url = $"task/{NotExistingTaskId}/open";
+            var url = "task/-1/open";
             var client = _factory.CreateClient();
 
             // Act
@@ -222,7 +220,7 @@ namespace MyNozbe.API.E2ETests
         public async Task Rename_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
-            var url = $"task/{NotExistingTaskId}/rename/test";
+            var url = "task/-1/rename/test";
             var client = _factory.CreateClient();
 
             // Act
