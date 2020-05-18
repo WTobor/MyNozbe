@@ -49,21 +49,21 @@ namespace MyNozbe.API.Controllers
             return new ActionResultHelper<TaskModel>().GetActionResult(taskResult);
         }
 
-        [HttpPut("rename/{id}&{name}")]
+        [HttpPut("{id}/rename/{name}")]
         public ActionResult<TaskModel> Rename(int id, string name)
         {
             var taskResult = _taskService.Rename(id, name);
             return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
         }
 
-        [HttpPut("close/{id}")]
+        [HttpPut("{id}/close")]
         public ActionResult<TaskModel> MarkClosed(int id)
         {
             var taskResult = _taskService.MarkTaskAsClosed(id);
             return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
         }
 
-        [HttpPut("open/{id}")]
+        [HttpPut("{id}/open")]
         public ActionResult<TaskModel> MarkOpened(int id)
         {
             var taskResult = _taskService.MarkTaskAsOpened(id);

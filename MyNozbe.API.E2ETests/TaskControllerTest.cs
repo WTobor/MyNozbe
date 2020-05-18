@@ -13,15 +13,15 @@ namespace MyNozbe.API.E2ETests
 {
     public class TaskControllerTest : IClassFixture<CustomWebApplicationFactory>
     {
-        public TaskControllerTest(CustomWebApplicationFactory factory)
-        {
-            _factory = factory;
-        }
-
         private const int TaskId = 1;
         private const int NotExistingTaskId = 9999;
 
         private readonly WebApplicationFactory<Startup> _factory;
+
+        public TaskControllerTest(CustomWebApplicationFactory factory)
+        {
+            _factory = factory;
+        }
 
         [Theory]
         [AutoData]
@@ -114,7 +114,7 @@ namespace MyNozbe.API.E2ETests
         public async Task MarkClosed_ShouldChangeIsCompletedToTrueAsync([MaxLength(30)] string taskName)
         {
             // Arrange
-            var url = $"task/close/{TaskId}";
+            var url = $"task/{TaskId}/close";
             var client = _factory.CreateClient();
             await CreateTestTaskAsync(taskName, client);
 
@@ -135,7 +135,7 @@ namespace MyNozbe.API.E2ETests
         public async Task MarkOpened_ShouldChangeIsCompletedToFalseAsync([MaxLength(30)] string taskName)
         {
             // Arrange
-            var url = $"task/open/{TaskId}";
+            var url = $"task/{TaskId}/open";
             var client = _factory.CreateClient();
             await CreateTestTaskAsync(taskName, client);
 
@@ -157,7 +157,7 @@ namespace MyNozbe.API.E2ETests
             [MaxLength(30)] string newTaskName)
         {
             // Arrange
-            var url = $"task/rename/{TaskId}&{newTaskName}";
+            var url = $"task/{TaskId}/rename/{newTaskName}";
             var client = _factory.CreateClient();
             await CreateTestTaskAsync(taskName, client);
 
@@ -179,7 +179,7 @@ namespace MyNozbe.API.E2ETests
             [MinLength(31)] string newTaskName)
         {
             // Arrange
-            var url = $"task/rename/{TaskId}&{newTaskName}";
+            var url = $"task/{TaskId}/rename/{newTaskName}";
             var client = _factory.CreateClient();
             await CreateTestTaskAsync(taskName, client);
 
@@ -188,19 +188,6 @@ namespace MyNozbe.API.E2ETests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        private static async Task<T> GetResult<T>(HttpResponseMessage response)
-        {
-            var stringResponse = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<T>(stringResponse);
-            return result;
-        }
-
-        private static async Task CreateTestTaskAsync(string name, HttpClient client)
-        {
-            var url = $"task?name={name}";
-            await client.PostAsync(url, null);
         }
 
         [Fact]
@@ -221,7 +208,7 @@ namespace MyNozbe.API.E2ETests
         public async Task MarkClosedNotExistingTask_ShouldReturnNotFoundAsync()
         {
             // Arrange
-            var url = $"task/close/{NotExistingTaskId}";
+            var url = $"task/{NotExistingTaskId}/close";
             var client = _factory.CreateClient();
 
             // Act
@@ -235,7 +222,7 @@ namespace MyNozbe.API.E2ETests
         public async Task MarkOpenedNotExistingTask_ShouldReturnNotFoundAsync()
         {
             // Arrange
-            var url = $"task/open/{NotExistingTaskId}";
+            var url = $"task/{NotExistingTaskId}/open";
             var client = _factory.CreateClient();
 
             // Act
@@ -249,7 +236,7 @@ namespace MyNozbe.API.E2ETests
         public async Task RenameNotExistingTask_ShouldReturnNotFoundAsync()
         {
             // Arrange
-            var url = $"task/rename/{NotExistingTaskId}&test";
+            var url = $"task/{NotExistingTaskId}/rename/test";
             var client = _factory.CreateClient();
 
             // Act
@@ -257,6 +244,19 @@ namespace MyNozbe.API.E2ETests
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        private static async Task<T> GetResult<T>(HttpResponseMessage response)
+        {
+            var stringResponse = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<T>(stringResponse);
+            return result;
+        }
+
+        private static async Task CreateTestTaskAsync(string name, HttpClient client)
+        {
+            var url = $"task?name={name}";
+            await client.PostAsync(url, null);
         }
     }
 }
