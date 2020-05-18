@@ -43,10 +43,10 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<TaskModel> Add(string name)
+        public ActionResult<int> Add(string name)
         {
             var taskResult = _taskService.AddTask(name);
-            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult);
+            return new ActionResultHelper<int>().GetActionResult(taskResult);
         }
 
         [HttpPut("{id}/rename/{name}")]

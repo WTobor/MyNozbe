@@ -16,18 +16,18 @@ namespace MyNozbe.Domain.Services
             _taskModelDbOperations = taskModelDbOperations;
         }
 
-        public OperationResult<TaskModel> AddTask(string name)
+        public OperationResult<int> AddTask(string name)
         {
             var taskModel = new TaskModel(name);
             var validator = new TaskModelValidator();
             var result = validator.Validate(taskModel);
             if (!result.IsValid)
             {
-                return GetValidationFailedOperationResult(result);
+                return GetValidationFailedOperationResult<int>(result);
             }
 
-            taskModel = _taskModelDbOperations.Create(taskModel);
-            return new OperationResult<TaskModel>(taskModel);
+            var taskId = _taskModelDbOperations.Add(taskModel);
+            return new OperationResult<int>(taskId);
         }
 
         public OperationResult<TaskModel> MarkTaskAsOpened(int taskId)
@@ -70,17 +70,17 @@ namespace MyNozbe.Domain.Services
             var result = validator.Validate(taskModel);
             if (!result.IsValid)
             {
-                return GetValidationFailedOperationResult(result);
+                return GetValidationFailedOperationResult<TaskModel>(result);
             }
 
             _taskModelDbOperations.Update(taskModel);
             return new OperationResult<TaskModel>(OperationResultStatus.Ok);
         }
 
-        private OperationResult<TaskModel> GetValidationFailedOperationResult(ValidationResult result)
+        private OperationResult<T> GetValidationFailedOperationResult<T>(ValidationResult result)
         {
             var validationErrors = GetValidationErrorMessage(result.Errors);
-            return new OperationResult<TaskModel>(validationErrors, OperationResultStatus.ValidationFailed);
+            return new OperationResult<T>(validationErrors, OperationResultStatus.ValidationFailed);
         }
 
         private string GetValidationErrorMessage(IEnumerable<ValidationFailure> errors)

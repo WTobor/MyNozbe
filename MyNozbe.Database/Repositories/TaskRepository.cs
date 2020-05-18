@@ -14,12 +14,12 @@ namespace MyNozbe.Database.Repositories
             _databaseContext = databaseContext;
         }
 
-        public TaskModel Create(TaskModel model)
+        public int Add(TaskModel model)
         {
             var task = new Task(model.Name, DateTimeOffset.Now, model.IsCompleted);
             _databaseContext.Tasks.Add(task);
             _databaseContext.SaveChanges();
-            return MapTaskToTaskModel(task);
+            return task.Id;
         }
 
         public TaskModel Get(int taskId)

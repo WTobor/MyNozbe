@@ -2,7 +2,7 @@
 {
     public interface IDbOperations <T>
     {
-        T Create(T model);
+        int Add(T model);
 
         void Update(T model);
 
