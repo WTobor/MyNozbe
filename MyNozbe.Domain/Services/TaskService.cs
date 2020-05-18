@@ -1,26 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FluentValidation;
 using FluentValidation.Results;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
-using MyNozbe.Domain.Validators;
 
 namespace MyNozbe.Domain.Services
 {
     public class TaskService
     {
         private readonly IDbOperations<TaskModel> _taskModelDbOperations;
+        private readonly IValidator<TaskModel> _taskModelValidator;
 
-        public TaskService(IDbOperations<TaskModel> taskModelDbOperations)
+        public TaskService(IDbOperations<TaskModel> taskModelDbOperations, IValidator<TaskModel> taskModelValidator)
         {
             _taskModelDbOperations = taskModelDbOperations;
+            _taskModelValidator = taskModelValidator;
         }
 
         public OperationResult<int> AddTask(string name)
         {
             var taskModel = new TaskModel(name);
-            var validator = new TaskModelValidator();
-            var result = validator.Validate(taskModel);
+            var result = _taskModelValidator.Validate(taskModel);
             if (!result.IsValid)
             {
                 return GetValidationFailedOperationResult<int>(result);
@@ -66,8 +67,7 @@ namespace MyNozbe.Domain.Services
 
             taskModel.Rename(name);
 
-            var validator = new TaskModelValidator();
-            var result = validator.Validate(taskModel);
+            var result = _taskModelValidator.Validate(taskModel);
             if (!result.IsValid)
             {
                 return GetValidationFailedOperationResult<TaskModel>(result);
