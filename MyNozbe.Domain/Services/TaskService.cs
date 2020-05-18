@@ -28,7 +28,7 @@ namespace MyNozbe.Domain.Services
             }
 
             var taskId = _taskModelDbOperations.Add(taskModel);
-            return new OperationResult<int>(taskId);
+            return OperationResult<int>.Ok(taskId);
         }
 
         public OperationResult<TaskModel> MarkTaskAsOpened(int taskId)
@@ -36,12 +36,12 @@ namespace MyNozbe.Domain.Services
             var taskModel = _taskModelDbOperations.Get(taskId);
             if (taskModel == null)
             {
-                return new OperationResult<TaskModel>(OperationResultStatus.NotFound);
+                return OperationResult<TaskModel>.NotFound();
             }
 
             taskModel.MarkAsOpened();
             _taskModelDbOperations.Update(taskModel);
-            return new OperationResult<TaskModel>(taskModel);
+            return OperationResult<TaskModel>.Ok();
         }
 
         public OperationResult<TaskModel> MarkTaskAsClosed(int taskId)
@@ -49,12 +49,12 @@ namespace MyNozbe.Domain.Services
             var taskModel = _taskModelDbOperations.Get(taskId);
             if (taskModel == null)
             {
-                return new OperationResult<TaskModel>(OperationResultStatus.NotFound);
+                return OperationResult<TaskModel>.NotFound();
             }
 
             taskModel.MarkAsClosed();
             _taskModelDbOperations.Update(taskModel);
-            return new OperationResult<TaskModel>(taskModel);
+            return OperationResult<TaskModel>.Ok();
         }
 
         public OperationResult<TaskModel> Rename(int taskId, string name)
@@ -62,7 +62,7 @@ namespace MyNozbe.Domain.Services
             var taskModel = _taskModelDbOperations.Get(taskId);
             if (taskModel == null)
             {
-                return new OperationResult<TaskModel>(OperationResultStatus.NotFound);
+                return OperationResult<TaskModel>.NotFound();
             }
 
             taskModel.Rename(name);
@@ -74,16 +74,16 @@ namespace MyNozbe.Domain.Services
             }
 
             _taskModelDbOperations.Update(taskModel);
-            return new OperationResult<TaskModel>(OperationResultStatus.Ok);
+            return OperationResult<TaskModel>.Ok();
         }
 
-        private OperationResult<T> GetValidationFailedOperationResult<T>(ValidationResult result)
+        private static OperationResult<T> GetValidationFailedOperationResult<T>(ValidationResult result)
         {
             var validationErrors = GetValidationErrorMessage(result.Errors);
-            return new OperationResult<T>(validationErrors, OperationResultStatus.ValidationFailed);
+            return OperationResult<T>.ValidationFailed(validationErrors);
         }
 
-        private string GetValidationErrorMessage(IEnumerable<ValidationFailure> errors)
+        private static string GetValidationErrorMessage(IEnumerable<ValidationFailure> errors)
         {
             return string.Join(";", errors.Select(x => x.ErrorMessage));
         }

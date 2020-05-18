@@ -2,28 +2,45 @@
 {
     public class OperationResult<T>
     {
-        public OperationResult(T resultObject)
-        {
-            ResultObject = resultObject;
-            StatusCode = OperationResultStatus.Ok;
-        }
-
-        public OperationResult(OperationResultStatus statusCode)
-        {
-            StatusCode = statusCode;
-        }
-
-        public OperationResult(string errorMessage, OperationResultStatus statusCode)
-        {
-            ErrorMessage = errorMessage;
-            StatusCode = statusCode;
-        }
-
         public T ResultObject { get; set; }
 
         public string ErrorMessage { get; set; }
 
         public OperationResultStatus StatusCode { get; set; }
+
+        public static OperationResult<T> Ok()
+        {
+            return new OperationResult<T>()
+            {
+                StatusCode = OperationResultStatus.Ok
+            };
+        }
+
+        public static OperationResult<T> Ok(T resultObject)
+        {
+            return new OperationResult<T>()
+            {
+                ResultObject = resultObject,
+                StatusCode = OperationResultStatus.Ok
+            };
+        }
+
+        public static OperationResult<T> NotFound()
+        {
+            return new OperationResult<T>()
+            {
+                StatusCode = OperationResultStatus.NotFound
+            };
+        }
+
+        public static OperationResult<T> ValidationFailed(string errorMessage)
+        {
+            return new OperationResult<T>()
+            {
+                ErrorMessage = errorMessage,
+                StatusCode = OperationResultStatus.ValidationFailed
+            };
+        }
     }
 
     public enum OperationResultStatus
