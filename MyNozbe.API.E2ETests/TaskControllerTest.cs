@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using Xunit;
@@ -34,14 +34,15 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PostAsync(url, null);
 
             // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
             var taskResult = await GetResult<int>(response);
-            Assert.True(taskResult > 0);
+            taskResult.Should().BeGreaterThan(0);
         }
 
         [Theory]
-        [AutoData]
-        public async Task AddWithTooLongName_ShouldFailAsync([MinLength(31)] string taskName)
+        [InlineData("aa")]
+        [InlineData("this_is_too_long_name_for_task_")]
+        public async Task Add_WhenInvalidName_ShouldReturnBadRequestAsync(string taskName)
         {
             // Arrange
             var url = $"task?name={taskName}";
@@ -51,27 +52,12 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PostAsync(url, null);
 
             // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Theory]
         [AutoData]
-        public async Task AddWithTooShortName_ShouldFailAsync([MaxLength(2)] string taskName)
-        {
-            // Arrange
-            var url = $"task?name={taskName}";
-            var client = _factory.CreateClient();
-
-            // Act
-            var response = await client.PostAsync(url, null);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Theory]
-        [AutoData]
-        public async Task GetWithoutParameter_ShouldReturnAllTasksAsync([MaxLength(30)] string task1Name,
+        public async Task GetAll_ShouldReturnAddedTasksAsync([MaxLength(30)] string task1Name,
             [MaxLength(30)] string task2Name)
         {
             // Arrange
@@ -84,15 +70,15 @@ namespace MyNozbe.API.E2ETests
             var response = await client.GetAsync(url);
 
             // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
             var tasksResult = await GetResult<List<TaskTestModel>>(response);
-            Assert.Contains(task1Id, tasksResult.Select(x => x.Id));
-            Assert.Contains(task2Id, tasksResult.Select(x => x.Id));
+            tasksResult.Should().Contain(x => x.Id == task1Id);
+            tasksResult.Should().Contain(x => x.Id == task2Id);
         }
 
         [Theory]
         [AutoData]
-        public async Task GetWithParameter_ShouldReturnTaskAsync([MaxLength(30)] string taskName)
+        public async Task Get_ShouldReturnTaskWithCorrectIdAsync([MaxLength(30)] string taskName)
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -103,9 +89,9 @@ namespace MyNozbe.API.E2ETests
             var response = await client.GetAsync(url);
 
             // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
             var taskResult = await GetResult<TaskTestModel>(response);
-            Assert.Equal(taskId, taskResult.Id);
+            taskResult.Id.Should().Be(taskId);
         }
 
         [Theory]
@@ -119,14 +105,15 @@ namespace MyNozbe.API.E2ETests
 
             // Act
             var operationResponse = await client.PutAsync(url, null);
-            var taskResponse = await client.GetAsync($"task/{taskId}");
 
             // Assert
-            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
+
+            var taskResponse = await client.GetAsync($"task/{taskId}");
+            operationResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
             var taskResult = await GetResult<TaskTestModel>(taskResponse);
-            Assert.Equal(taskId, taskResult.Id);
-            Assert.True(taskResult.IsCompleted);
+            taskResult.Id.Should().Be(taskId);
+            taskResult.IsCompleted.Should().BeTrue();
         }
 
         [Theory]
@@ -140,14 +127,14 @@ namespace MyNozbe.API.E2ETests
 
             // Act
             var operationResponse = await client.PutAsync(url, null);
-            var taskResponse = await client.GetAsync($"task/{taskId}");
 
             // Assert
-            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
+            var taskResponse = await client.GetAsync($"task/{taskId}");
+            operationResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
             var taskResult = await GetResult<TaskTestModel>(taskResponse);
-            Assert.Equal(taskId, taskResult.Id);
-            Assert.False(taskResult.IsCompleted);
+            taskResult.Id.Should().Be(taskId);
+            taskResult.IsCompleted.Should().BeFalse();
         }
 
         [Theory]
@@ -162,19 +149,19 @@ namespace MyNozbe.API.E2ETests
 
             // Act
             var operationResponse = await client.PutAsync(url, null);
-            var taskResponse = await client.GetAsync($"task/{taskId}");
 
             // Assert
-            Assert.Equal(HttpStatusCode.NoContent, operationResponse.StatusCode);
+            operationResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            var taskResponse = await client.GetAsync($"task/{taskId}");
 
             var taskResult = await GetResult<TaskTestModel>(taskResponse);
-            Assert.Equal(taskId, taskResult.Id);
-            Assert.Equal(newTaskName, taskResult.Name);
+            taskResult.Id.Should().Be(taskId);
+            taskResult.Name.Should().Be(newTaskName);
         }
 
         [Theory]
         [AutoData]
-        public async Task RenameWithTooLongName_ShouldFailAsync([MaxLength(30)] string taskName,
+        public async Task Rename_WhenNameIsTooLong_ShouldReturnBadRequestAsync([MaxLength(30)] string taskName,
             [MinLength(31)] string newTaskName)
         {
             // Arrange
@@ -186,11 +173,11 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PutAsync(url, null);
 
             // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
-        public async Task GetWithParameterNotExistingTask_ShouldReturnNotFoundAsync()
+        public async Task Get_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
             var url = $"task/{NotExistingTaskId}";
@@ -200,11 +187,11 @@ namespace MyNozbe.API.E2ETests
             var response = await client.GetAsync(url);
 
             // Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task MarkClosedNotExistingTask_ShouldReturnNotFoundAsync()
+        public async Task MarkClosed_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
             var url = $"task/{NotExistingTaskId}/close";
@@ -214,11 +201,11 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PutAsync(url, null);
 
             // Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task MarkOpenedNotExistingTask_ShouldReturnNotFoundAsync()
+        public async Task MarkOpened_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
             var url = $"task/{NotExistingTaskId}/open";
@@ -228,11 +215,11 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PutAsync(url, null);
 
             // Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
-        public async Task RenameNotExistingTask_ShouldReturnNotFoundAsync()
+        public async Task Rename_WhenIdIsNotExisting_ShouldReturnNotFoundAsync()
         {
             // Arrange
             var url = $"task/{NotExistingTaskId}/rename/test";
@@ -242,7 +229,7 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PutAsync(url, null);
 
             // Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         private static async Task<T> GetResult<T>(HttpResponseMessage response)
