@@ -46,28 +46,28 @@ namespace MyNozbe.API.Controllers
         public ActionResult<int> Add(string name)
         {
             var taskResult = _taskService.AddTask(name);
-            return new ActionResultHelper<int>().GetActionResult(taskResult);
+            return ActionResultHelper<int>.GetActionResult(taskResult);
         }
 
         [HttpPut("{id}/rename/{name}")]
         public ActionResult<TaskModel> Rename(int id, string name)
         {
             var taskResult = _taskService.Rename(id, name);
-            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
+            return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }
 
         [HttpPut("{id}/close")]
         public ActionResult<TaskModel> MarkClosed(int id)
         {
             var taskResult = _taskService.MarkTaskAsClosed(id);
-            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
+            return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }
 
         [HttpPut("{id}/open")]
         public ActionResult<TaskModel> MarkOpened(int id)
         {
             var taskResult = _taskService.MarkTaskAsOpened(id);
-            return new ActionResultHelper<TaskModel>().GetActionResult(taskResult, false);
+            return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }
     }
 }

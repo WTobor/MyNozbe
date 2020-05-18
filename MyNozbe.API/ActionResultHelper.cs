@@ -3,35 +3,33 @@ using MyNozbe.Domain.Models;
 
 namespace MyNozbe.API
 {
-    public class ActionResultHelper<T> : ControllerBase
+    public static class ActionResultHelper<T>
     {
-        public ActionResult<T> GetActionResult(OperationResult<T> operationResult, bool returnResultObject = true)
+        public static ActionResult<T> GetActionResult(OperationResult<T> operationResult,
+            bool returnResultObject = true)
         {
-            if (operationResult.StatusCode == OperationResultStatus.NotFound)
+            switch (operationResult.StatusCode)
             {
+                case OperationResultStatus.NotFound:
                 {
-                    return NotFound();
-                }
-            }
-
-            if (operationResult.StatusCode == OperationResultStatus.ValidationFailed)
-            {
-                {
-                    return BadRequest(operationResult.ErrorMessage);
-                }
-            }
-
-            if (operationResult.StatusCode == OperationResultStatus.Ok)
-            {
-                if (returnResultObject)
-                {
-                    return Ok(operationResult.ResultObject);
+                    return new NotFoundResult();
                 }
 
-                return NoContent();
-            }
+                case OperationResultStatus.ValidationFailed:
+                {
+                    return new BadRequestObjectResult(operationResult.ErrorMessage);
+                }
 
-            return BadRequest();
+                case OperationResultStatus.Ok:
+                    if (returnResultObject)
+                    {
+                        return new OkObjectResult(operationResult.ResultObject);
+                    }
+
+                    return new NoContentResult();
+                default:
+                    return new BadRequestResult();
+            }
         }
     }
 }
