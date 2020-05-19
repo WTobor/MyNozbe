@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
+using MyNozbe.API.E2ETests.TestModels;
 using Xunit;
 
 namespace MyNozbe.API.E2ETests
@@ -33,7 +33,7 @@ namespace MyNozbe.API.E2ETests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var taskResult = await GetResult<int>(response);
+            var taskResult = await ResponseHelper.GetResult<int>(response);
             taskResult.Should().BeGreaterThan(0);
         }
 
@@ -69,7 +69,7 @@ namespace MyNozbe.API.E2ETests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var tasksResult = await GetResult<List<TaskTestModel>>(response);
+            var tasksResult = await ResponseHelper.GetResult<List<TaskTestModel>>(response);
             tasksResult.Should().Contain(x => x.Id == task1Id);
             tasksResult.Should().Contain(x => x.Id == task2Id);
         }
@@ -88,7 +88,7 @@ namespace MyNozbe.API.E2ETests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var taskResult = await GetResult<TaskTestModel>(response);
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(response);
             taskResult.Id.Should().Be(taskId);
         }
 
@@ -109,7 +109,7 @@ namespace MyNozbe.API.E2ETests
             var taskResponse = await client.GetAsync($"task/{taskId}");
             operationResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var taskResult = await GetResult<TaskTestModel>(taskResponse);
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(taskResponse);
             taskResult.Id.Should().Be(taskId);
             taskResult.IsCompleted.Should().BeTrue();
         }
@@ -130,7 +130,7 @@ namespace MyNozbe.API.E2ETests
             var taskResponse = await client.GetAsync($"task/{taskId}");
             operationResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var taskResult = await GetResult<TaskTestModel>(taskResponse);
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(taskResponse);
             taskResult.Id.Should().Be(taskId);
             taskResult.IsCompleted.Should().BeFalse();
         }
@@ -152,7 +152,7 @@ namespace MyNozbe.API.E2ETests
             operationResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
             var taskResponse = await client.GetAsync($"task/{taskId}");
 
-            var taskResult = await GetResult<TaskTestModel>(taskResponse);
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(taskResponse);
             taskResult.Id.Should().Be(taskId);
             taskResult.Name.Should().Be(newTaskName);
         }
@@ -230,18 +230,11 @@ namespace MyNozbe.API.E2ETests
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        private static async Task<T> GetResult<T>(HttpResponseMessage response)
-        {
-            var stringResponse = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<T>(stringResponse);
-            return result;
-        }
-
         private static async Task<int> AddTestTaskAsync(string name, HttpClient client)
         {
             var url = $"task?name={name}";
             var response = await client.PostAsync(url, null);
-            return await GetResult<int>(response);
+            return await ResponseHelper.GetResult<int>(response);
         }
     }
 }

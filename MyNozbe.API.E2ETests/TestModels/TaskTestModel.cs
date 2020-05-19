@@ -1,4 +1,4 @@
-﻿namespace MyNozbe.API.E2ETests
+﻿namespace MyNozbe.API.E2ETests.TestModels
 {
     public class TaskTestModel
     {
