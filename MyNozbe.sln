@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyNozbe.API", "MyNozbe.API\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyNozbe.Database", "MyNozbe.Database\MyNozbe.Database.csproj", "{271292D1-05FA-4A9C-AD0D-3F49B3C708F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNozbe.API.E2ETests", "MyNozbe.API.E2ETests\MyNozbe.API.E2ETests.csproj", "{21A8D638-BAE3-4CF7-B6F0-FC6A22169DEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyNozbe.API.E2ETests", "MyNozbe.API.E2ETests\MyNozbe.API.E2ETests.csproj", "{21A8D638-BAE3-4CF7-B6F0-FC6A22169DEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNozbe.Domain", "MyNozbe.Domain\MyNozbe.Domain.csproj", "{0AD37F3F-4608-4BC9-9818-757A09B5116A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyNozbe.Domain", "MyNozbe.Domain\MyNozbe.Domain.csproj", "{0AD37F3F-4608-4BC9-9818-757A09B5116A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNozbe.Domain.UnitTests", "MyNozbe.Domain.UnitTests\MyNozbe.Domain.UnitTests.csproj", "{88D5CF2E-63DD-4F2D-AE1F-9963C3ACD510}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{0AD37F3F-4608-4BC9-9818-757A09B5116A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AD37F3F-4608-4BC9-9818-757A09B5116A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AD37F3F-4608-4BC9-9818-757A09B5116A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88D5CF2E-63DD-4F2D-AE1F-9963C3ACD510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88D5CF2E-63DD-4F2D-AE1F-9963C3ACD510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88D5CF2E-63DD-4F2D-AE1F-9963C3ACD510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88D5CF2E-63DD-4F2D-AE1F-9963C3ACD510}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
