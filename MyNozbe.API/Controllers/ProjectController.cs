@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyNozbe.Database;
 using MyNozbe.Database.Models;
-using MyNozbe.Domain.Models;
+using MyNozbe.Domain.Services;
 
 namespace MyNozbe.API.Controllers
 {
@@ -15,11 +14,14 @@ namespace MyNozbe.API.Controllers
     {
         private readonly DatabaseContext _databaseContext;
         private readonly ILogger<ProjectController> _logger;
+        private readonly ProjectService _projectService;
 
-        public ProjectController(ILogger<ProjectController> logger, DatabaseContext databaseContext)
+        public ProjectController(ILogger<ProjectController> logger, DatabaseContext databaseContext,
+            ProjectService projectService)
         {
             _logger = logger;
             _databaseContext = databaseContext;
+            _projectService = projectService;
         }
 
         [HttpGet]
@@ -43,15 +45,8 @@ namespace MyNozbe.API.Controllers
         [HttpPost]
         public ActionResult<int> Add(string name)
         {
-            var project = new Project(name, DateTimeOffset.Now);
-            _databaseContext.Projects.Add(project);
-            _databaseContext.SaveChanges();
-
-            var result = new OperationResult<int>
-            {
-                ResultObject = project.Id
-            };
-            return ActionResultHelper<int>.GetActionResult(result);
+            var projectResult = _projectService.AddProject(name);
+            return ActionResultHelper<int>.GetActionResult(projectResult);
         }
     }
 }
