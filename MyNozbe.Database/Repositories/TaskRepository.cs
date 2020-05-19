@@ -1,4 +1,5 @@
 ﻿using System;
+using MyNozbe.Database.Mappers;
 using MyNozbe.Database.Models;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
@@ -25,7 +26,7 @@ namespace MyNozbe.Database.Repositories
         public TaskModel Get(int taskId)
         {
             var task = _databaseContext.Tasks.Find(taskId);
-            return MapTaskToTaskModel(task);
+            return TaskMapper.MapTaskToTaskModel(task);
         }
 
         public void Update(TaskModel model)
@@ -34,16 +35,6 @@ namespace MyNozbe.Database.Repositories
             task.Name = model.Name;
             task.IsCompleted = model.IsCompleted;
             _databaseContext.SaveChanges();
-        }
-
-        private static TaskModel MapTaskToTaskModel(Task task)
-        {
-            if (task is null)
-            {
-                return null;
-            }
-
-            return new TaskModel(task.Id, task.Name, task.IsCompleted);
         }
     }
 }

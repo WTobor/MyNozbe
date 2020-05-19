@@ -9,10 +9,17 @@ namespace MyNozbe.Domain.Models
             Name = name;
         }
 
+        public ProjectModel(int id, string name, IEnumerable<TaskModel> tasks)
+        {
+            Id = id;
+            Name = name;
+            TaskModels = tasks;
+        }
+
         public int Id { get; }
 
         public string Name { get; }
 
-        public IEnumerable<TaskModel> TaskModels { get; private set; }
+        public IEnumerable<TaskModel> TaskModels { get; }
     }
 }

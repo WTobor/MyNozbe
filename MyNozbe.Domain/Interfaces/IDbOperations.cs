@@ -6,6 +6,6 @@
 
         void Update(T model);
 
-        T Get(int taskId);
+        T Get(int id);
     }
 }

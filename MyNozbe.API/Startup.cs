@@ -33,7 +33,9 @@ namespace MyNozbe.API
 
             services.AddScoped<DatabaseContext>();
             services.AddScoped<IDbOperations<TaskModel>, TaskRepository>();
+            services.AddScoped<IDbOperations<ProjectModel>, ProjectRepository>();
             services.AddScoped<TaskService>();
+            services.AddScoped<ProjectService>();
 
             services.AddControllers()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<TaskModelValidator>());
