@@ -87,7 +87,7 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PostAsync(url, null);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
             var projectResponse = await client.GetAsync($"project/{projectId}");
 
             var projectResult = await ResponseHelper.GetResult<ProjectTestModel>(projectResponse);

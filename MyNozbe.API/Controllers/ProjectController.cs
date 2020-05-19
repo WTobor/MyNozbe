@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyNozbe.Database;
 using MyNozbe.Database.Models;
+using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Services;
 
 namespace MyNozbe.API.Controllers
@@ -47,6 +48,13 @@ namespace MyNozbe.API.Controllers
         {
             var projectResult = _projectService.AddProject(name);
             return ActionResultHelper<int>.GetActionResult(projectResult);
+        }
+
+        [HttpPost("{id}/rename/{name}")]
+        public ActionResult<ProjectModel> Rename(int id, string name)
+        {
+            var projectResult = _projectService.Rename(id, name);
+            return ActionResultHelper<ProjectModel>.GetActionResult(projectResult, false);
         }
     }
 }

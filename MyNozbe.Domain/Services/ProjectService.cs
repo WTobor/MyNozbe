@@ -19,5 +19,18 @@ namespace MyNozbe.Domain.Services
             var projectId = _projectModelDbOperations.Add(projectModel);
             return OperationResult<int>.Ok(projectId);
         }
+
+        public OperationResult<ProjectModel> Rename(int projectId, string name)
+        {
+            var project = _projectModelDbOperations.Get(projectId);
+            if (project == null)
+            {
+                return OperationResult<ProjectModel>.NotFound();
+            }
+
+            project.Rename(name);
+            _projectModelDbOperations.Update(project);
+            return OperationResult<ProjectModel>.Ok();
+        }
     }
 }

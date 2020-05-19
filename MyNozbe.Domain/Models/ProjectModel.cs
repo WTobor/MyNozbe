@@ -18,8 +18,13 @@ namespace MyNozbe.Domain.Models
 
         public int Id { get; }
 
-        public string Name { get; }
+        public string Name { get; private set; }
 
         public IEnumerable<TaskModel> TaskModels { get; }
+
+        public void Rename(string name)
+        {
+            Name = name;
+        }
     }
 }
