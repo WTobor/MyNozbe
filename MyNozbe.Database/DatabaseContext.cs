@@ -10,5 +10,7 @@ namespace MyNozbe.Database
         }
 
         public DbSet<Task> Tasks { get; set; }
+
+        public DbSet<Project> Projects { get; set; }
     }
 }
