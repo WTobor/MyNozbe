@@ -34,7 +34,8 @@ namespace MyNozbe.Database.Repositories
         {
             var project = _databaseContext.Projects.Find(model.Id);
             project.Name = model.Name;
-            project.Tasks = model.TaskModels?.Select(x => _databaseContext.Tasks.Find(x.Id));
+            project.Tasks = model.TaskModels?.Select(x => _databaseContext.Tasks.Find(x.Id)).ToList();
+
             _databaseContext.SaveChanges();
         }
 
@@ -45,7 +46,7 @@ namespace MyNozbe.Database.Repositories
                 return null;
             }
 
-            var tasks = project.Tasks?.Select(TaskMapper.MapTaskToTaskModel);
+            var tasks = project.Tasks?.Select(TaskMapper.MapTaskToTaskModel).ToList();
 
             return new ProjectModel(project.Id, project.Name, tasks);
         }

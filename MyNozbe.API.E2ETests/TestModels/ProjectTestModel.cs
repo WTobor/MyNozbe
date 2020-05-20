@@ -8,6 +8,6 @@ namespace MyNozbe.API.E2ETests.TestModels
 
         public string Name { get; set; }
 
-        public IEnumerable<TaskTestModel> TaskTestModels { get; set; }
+        public ICollection<TaskTestModel> Tasks { get; set; }
     }
 }

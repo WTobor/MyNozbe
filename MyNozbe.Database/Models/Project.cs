@@ -21,6 +21,6 @@ namespace MyNozbe.Database.Models
         [Required]
         public DateTimeOffset CreationDateTime { get; set; }
 
-        public IEnumerable<Task> Tasks { get; set; }
+        public virtual ICollection<Task> Tasks { get; set; }
     }
 }

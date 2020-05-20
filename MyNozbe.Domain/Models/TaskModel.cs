@@ -21,6 +21,8 @@
 
         public bool IsCompleted { get; private set; }
 
+        public int? ProjectId { get; private set; }
+
         public void MarkAsOpened()
         {
             IsCompleted = false;
@@ -34,6 +36,11 @@
         public void Rename(string name)
         {
             Name = name;
+        }
+
+        public void AssignToProject(int projectId)
+        {
+            ProjectId = projectId;
         }
     }
 }

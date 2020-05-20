@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -97,23 +98,23 @@ namespace MyNozbe.API.E2ETests
 
         [Theory]
         [AutoData]
-        public async Task AssignTask_ShouldAssignTaskToProjectAsync(string projectName, string taskName)
+        public async Task AssignTask_ShouldAssignTaskToProjectAsync(string projectName, [MaxLength(30)] string taskName)
         {
             // Arrange
             var client = _factory.CreateClient();
             var taskId = await AddTestTaskAsync(taskName, client);
             var projectId = await AddTestProjectAsync(projectName, client);
-            var url = $"project/{projectId}/assignTask/{taskId}";
+            var url = $"project/{projectId}/assign/task/{taskId}";
 
             // Act
             var response = await client.PostAsync(url, null);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
             var projectResponse = await client.GetAsync($"project/{projectId}");
 
             var projectResult = await ResponseHelper.GetResult<ProjectTestModel>(projectResponse);
-            projectResult.TaskTestModels.Should().Contain(x => x.Id == taskId);
+            projectResult.Tasks.Should().Contain(x => x.Id == taskId);
         }
 
 

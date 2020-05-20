@@ -9,7 +9,7 @@ namespace MyNozbe.Domain.Models
             Name = name;
         }
 
-        public ProjectModel(int id, string name, IEnumerable<TaskModel> tasks)
+        public ProjectModel(int id, string name, List<TaskModel> tasks)
         {
             Id = id;
             Name = name;
@@ -20,7 +20,7 @@ namespace MyNozbe.Domain.Models
 
         public string Name { get; private set; }
 
-        public IEnumerable<TaskModel> TaskModels { get; }
+        public ICollection<TaskModel> TaskModels { get; private set; }
 
         public void Rename(string name)
         {

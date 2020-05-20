@@ -23,5 +23,9 @@ namespace MyNozbe.Database.Models
 
         [Required]
         public DateTimeOffset CreationDateTime { get; set; }
+
+        public int? ProjectId { get; set; }
+
+        public virtual Project Project { get; set; }
     }
 }

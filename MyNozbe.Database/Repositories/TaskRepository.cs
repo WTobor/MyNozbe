@@ -34,6 +34,7 @@ namespace MyNozbe.Database.Repositories
             var task = _databaseContext.Tasks.Find(model.Id);
             task.Name = model.Name;
             task.IsCompleted = model.IsCompleted;
+            task.ProjectId = model.ProjectId;
             _databaseContext.SaveChanges();
         }
     }
