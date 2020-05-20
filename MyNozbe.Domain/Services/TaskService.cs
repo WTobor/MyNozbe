@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using MyNozbe.Domain.Interfaces;
@@ -18,48 +19,48 @@ namespace MyNozbe.Domain.Services
             _taskModelValidator = taskModelValidator;
         }
 
-        public OperationResult<int> AddTask(string name)
+        public async Task<OperationResult<int>> AddTaskAsync(string name)
         {
             var taskModel = new TaskModel(name);
-            var result = _taskModelValidator.Validate(taskModel);
+            var result = await _taskModelValidator.ValidateAsync(taskModel);
             if (!result.IsValid)
             {
                 return GetValidationFailedOperationResult<int>(result);
             }
 
-            var taskId = _taskModelDbOperations.Add(taskModel);
+            var taskId = await _taskModelDbOperations.AddAsync(taskModel);
             return OperationResult<int>.Ok(taskId);
         }
 
-        public OperationResult<TaskModel> MarkTaskAsOpened(int taskId)
+        public async Task<OperationResult<TaskModel>> MarkTaskAsOpenedAsync(int taskId)
         {
-            var taskModel = _taskModelDbOperations.Get(taskId);
+            var taskModel = await _taskModelDbOperations.GetAsync(taskId);
             if (taskModel == null)
             {
                 return OperationResult<TaskModel>.NotFound();
             }
 
             taskModel.MarkAsOpened();
-            _taskModelDbOperations.Update(taskModel);
+            await _taskModelDbOperations.UpdateAsync(taskModel);
             return OperationResult<TaskModel>.Ok();
         }
 
-        public OperationResult<TaskModel> MarkTaskAsClosed(int taskId)
+        public async Task<OperationResult<TaskModel>> MarkTaskAsClosedAsync(int taskId)
         {
-            var taskModel = _taskModelDbOperations.Get(taskId);
+            var taskModel = await _taskModelDbOperations.GetAsync(taskId);
             if (taskModel == null)
             {
                 return OperationResult<TaskModel>.NotFound();
             }
 
             taskModel.MarkAsClosed();
-            _taskModelDbOperations.Update(taskModel);
+            await _taskModelDbOperations.UpdateAsync(taskModel);
             return OperationResult<TaskModel>.Ok();
         }
 
-        public OperationResult<TaskModel> Rename(int taskId, string name)
+        public async Task<OperationResult<TaskModel>> RenameAsync(int taskId, string name)
         {
-            var taskModel = _taskModelDbOperations.Get(taskId);
+            var taskModel = await _taskModelDbOperations.GetAsync(taskId);
             if (taskModel == null)
             {
                 return OperationResult<TaskModel>.NotFound();
@@ -67,25 +68,26 @@ namespace MyNozbe.Domain.Services
 
             taskModel.Rename(name);
 
-            var result = _taskModelValidator.Validate(taskModel);
+            var result = await _taskModelValidator.ValidateAsync(taskModel);
             if (!result.IsValid)
             {
                 return GetValidationFailedOperationResult<TaskModel>(result);
             }
 
-            _taskModelDbOperations.Update(taskModel);
+            await _taskModelDbOperations.UpdateAsync(taskModel);
             return OperationResult<TaskModel>.Ok();
         }
 
-        public OperationResult<TaskModel> AssignProject(int taskId, int projectId)
+        public async Task<OperationResult<TaskModel>> AssignProjectAsync(int taskId, int projectId)
         {
-            var taskModel = _taskModelDbOperations.Get(taskId);
+            var taskModel = await _taskModelDbOperations.GetAsync(taskId);
             if (taskModel == null)
             {
                 return OperationResult<TaskModel>.NotFound();
             }
+
             taskModel.AssignToProject(projectId);
-            _taskModelDbOperations.Update(taskModel);
+            await _taskModelDbOperations.UpdateAsync(taskModel);
             return OperationResult<TaskModel>.Ok();
         }
 

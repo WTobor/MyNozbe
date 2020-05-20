@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyNozbe.Database;
-using MyNozbe.Database.Models;
 using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Services;
+using Task = MyNozbe.Database.Models.Task;
 
 namespace MyNozbe.API.Controllers
 {
@@ -25,15 +26,15 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Task>> GetAll()
+        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<Task>>> GetAllAsync()
         {
-            return Ok(_databaseContext.Tasks.ToList());
+            return Ok(await _databaseContext.Tasks.ToListAsync());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Task> Get(int id)
+        public async System.Threading.Tasks.Task<ActionResult<Task>> GetAsync(int id)
         {
-            var task = _databaseContext.Tasks.Find(id);
+            var task = await _databaseContext.Tasks.FindAsync(id);
             if (task == null)
             {
                 return NotFound();
@@ -43,37 +44,37 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<int> Add(string name)
+        public async Task<ActionResult<int>> AddAsync(string name)
         {
-            var taskResult = _taskService.AddTask(name);
+            var taskResult = await _taskService.AddTaskAsync(name);
             return ActionResultHelper<int>.GetActionResult(taskResult);
         }
 
         [HttpPut("{id}/rename/{name}")]
-        public ActionResult<TaskModel> Rename(int id, string name)
+        public async Task<ActionResult<TaskModel>> RenameAsync(int id, string name)
         {
-            var taskResult = _taskService.Rename(id, name);
+            var taskResult = await _taskService.RenameAsync(id, name);
             return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }
 
         [HttpPut("{id}/close")]
-        public ActionResult<TaskModel> MarkClosed(int id)
+        public async Task<ActionResult<TaskModel>> MarkClosedAsync(int id)
         {
-            var taskResult = _taskService.MarkTaskAsClosed(id);
+            var taskResult = await _taskService.MarkTaskAsClosedAsync(id);
             return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }
 
         [HttpPut("{id}/open")]
-        public ActionResult<TaskModel> MarkOpened(int id)
+        public async Task<ActionResult<TaskModel>> MarkOpenedAsync(int id)
         {
-            var taskResult = _taskService.MarkTaskAsOpened(id);
+            var taskResult = await _taskService.MarkTaskAsOpenedAsync(id);
             return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }
 
         [HttpPost("{id}/assign/project/{projectId}")]
-        public ActionResult<TaskModel> AssignTask(int id, int projectId)
+        public async Task<ActionResult<TaskModel>> AssignTaskAsync(int id, int projectId)
         {
-            var taskResult = _taskService.AssignProject(id, projectId);
+            var taskResult = await _taskService.AssignProjectAsync(id, projectId);
 
             return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }

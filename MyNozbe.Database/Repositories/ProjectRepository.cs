@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using MyNozbe.Database.Mappers;
 using MyNozbe.Database.Models;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
+using Task = System.Threading.Tasks.Task;
 
 namespace MyNozbe.Database.Repositories
 {
@@ -16,27 +18,26 @@ namespace MyNozbe.Database.Repositories
             _databaseContext = databaseContext;
         }
 
-        public int Add(ProjectModel model)
+        public async Task<int> AddAsync(ProjectModel model)
         {
             var project = new Project(model.Name, DateTimeOffset.Now);
-            _databaseContext.Projects.Add(project);
-            _databaseContext.SaveChanges();
+            await _databaseContext.Projects.AddAsync(project);
+            await _databaseContext.SaveChangesAsync();
             return project.Id;
         }
 
-        public ProjectModel Get(int projectId)
+        public async Task<ProjectModel> GetAsync(int projectId)
         {
-            var project = _databaseContext.Projects.Find(projectId);
+            var project = await _databaseContext.Projects.FindAsync(projectId);
             return MapProjectToProjectModel(project);
         }
 
-        public void Update(ProjectModel model)
+        public async Task UpdateAsync(ProjectModel model)
         {
-            var project = _databaseContext.Projects.Find(model.Id);
+            var project = await _databaseContext.Projects.FindAsync(model.Id);
             project.Name = model.Name;
-            project.Tasks = model.TaskModels?.Select(x => _databaseContext.Tasks.Find(x.Id)).ToList();
 
-            _databaseContext.SaveChanges();
+            await _databaseContext.SaveChangesAsync();
         }
 
         private static ProjectModel MapProjectToProjectModel(Project project)

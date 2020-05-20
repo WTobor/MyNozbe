@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -7,6 +7,7 @@ using MyNozbe.Database;
 using MyNozbe.Database.Models;
 using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Services;
+using Task = MyNozbe.Database.Models.Task;
 
 namespace MyNozbe.API.Controllers
 {
@@ -27,15 +28,15 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Project>> GetAll()
+        public async Task<ActionResult<IEnumerable<Project>>> GetAllAsync()
         {
-            return Ok(_databaseContext.Projects.Include(x => x.Tasks).ToList());
+            return Ok(await _databaseContext.Projects.Include(x => x.Tasks).ToListAsync());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Task> Get(int id)
+        public async Task<ActionResult<Task>> GetAsync(int id)
         {
-            var project = _databaseContext.Projects.Include(x => x.Tasks).FirstOrDefault(f => f.Id == id);
+            var project = await _databaseContext.Projects.Include(x => x.Tasks).FirstOrDefaultAsync(f => f.Id == id);
             if (project == null)
             {
                 return NotFound();
@@ -45,16 +46,16 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<int> Add(string name)
+        public async Task<ActionResult<int>> AddAsync(string name)
         {
-            var projectResult = _projectService.AddProject(name);
+            var projectResult = await _projectService.AddProjectAsync(name);
             return ActionResultHelper<int>.GetActionResult(projectResult);
         }
 
         [HttpPost("{id}/rename/{name}")]
-        public ActionResult<ProjectModel> Rename(int id, string name)
+        public async Task<ActionResult<ProjectModel>> RenameAsync(int id, string name)
         {
-            var projectResult = _projectService.Rename(id, name);
+            var projectResult = await _projectService.RenameAsync(id, name);
             return ActionResultHelper<ProjectModel>.GetActionResult(projectResult, false);
         }
     }

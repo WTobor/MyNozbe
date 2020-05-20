@@ -1,4 +1,5 @@
-﻿using MyNozbe.Domain.Interfaces;
+﻿using System.Threading.Tasks;
+using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
 
 namespace MyNozbe.Domain.Services
@@ -6,33 +7,30 @@ namespace MyNozbe.Domain.Services
     public class ProjectService
     {
         private readonly IDbOperations<ProjectModel> _projectModelDbOperations;
-        private readonly IDbOperations<TaskModel> _taskModelDbOperations;
 
-        public ProjectService(IDbOperations<ProjectModel> projectModelDbOperations,
-            IDbOperations<TaskModel> taskModelDbOperations)
+        public ProjectService(IDbOperations<ProjectModel> projectModelDbOperations)
         {
             _projectModelDbOperations = projectModelDbOperations;
-            _taskModelDbOperations = taskModelDbOperations;
         }
 
-        public OperationResult<int> AddProject(string name)
+        public async Task<OperationResult<int>> AddProjectAsync(string name)
         {
             var projectModel = new ProjectModel(name);
 
-            var projectId = _projectModelDbOperations.Add(projectModel);
+            var projectId = await _projectModelDbOperations.AddAsync(projectModel);
             return OperationResult<int>.Ok(projectId);
         }
 
-        public OperationResult<ProjectModel> Rename(int projectId, string name)
+        public async Task<OperationResult<ProjectModel>> RenameAsync(int projectId, string name)
         {
-            var project = _projectModelDbOperations.Get(projectId);
-            if (project == null)
+            var projectModel = await _projectModelDbOperations.GetAsync(projectId);
+            if (projectModel == null)
             {
                 return OperationResult<ProjectModel>.NotFound();
             }
 
-            project.Rename(name);
-            _projectModelDbOperations.Update(project);
+            projectModel.Rename(name);
+            await _projectModelDbOperations.UpdateAsync(projectModel);
             return OperationResult<ProjectModel>.Ok();
         }
     }

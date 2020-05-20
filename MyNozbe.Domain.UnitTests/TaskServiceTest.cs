@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentValidation;
 using FluentValidation.Results;
@@ -6,7 +8,6 @@ using Moq;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Services;
-using MyNozbe.Domain.Validators;
 using Xunit;
 
 namespace MyNozbe.Domain.UnitTests
@@ -15,19 +16,23 @@ namespace MyNozbe.Domain.UnitTests
     {
         [Theory]
         [AutoMoqData]
-        public void AddTask_ShouldCallAddMethod([Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
-            [Frozen] Mock<IValidator<TaskModelValidator>> taskModelValidatorMock,
+        public async Task AddTask_ShouldCallAddMethodAsync(
+            [Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
+            [Frozen] Mock<IValidator<TaskModel>> taskModelValidatorMock,
             TaskService taskService)
         {
-            taskModelValidatorMock.Setup(x => x.Validate(It.IsAny<TaskModel>())).Returns(new ValidationResult());
-            taskService.AddTask("test");
+            taskModelValidatorMock
+                .Setup(x => x.ValidateAsync(It.IsAny<TaskModel>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
 
-            taskModelDbOperationsMock.Verify(x => x.Add(It.Is<TaskModel>(y => y.Name == "test")), Times.Once);
+            await taskService.AddTaskAsync("test");
+
+            taskModelDbOperationsMock.Verify(x => x.AddAsync(It.Is<TaskModel>(y => y.Name == "test")), Times.Once);
         }
 
         [Theory]
         [AutoMoqData]
-        public void AddTask_WhenValidationFailure_ShouldNotCallAddMethod(
+        public async Task AddTask_WhenValidationFailure_ShouldNotCallAddMethodAsync(
             [Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
             [Frozen] Mock<IValidator<TaskModel>> taskModelValidatorMock,
             TaskService taskService)
@@ -36,69 +41,82 @@ namespace MyNozbe.Domain.UnitTests
             {
                 new ValidationFailure("Name", "aaa")
             });
-            taskModelValidatorMock.Setup(x => x.Validate(It.IsAny<TaskModel>())).Returns(valResult);
+            taskModelValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<TaskModel>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(valResult);
 
-            taskService.AddTask("test");
+            await taskService.AddTaskAsync("test");
 
-            taskModelDbOperationsMock.Verify(x => x.Add(It.Is<TaskModel>(y => y.Name == "test")), Times.Never);
+            taskModelDbOperationsMock.Verify(x => x.AddAsync(It.Is<TaskModel>(y => y.Name == "test")), Times.Never);
         }
 
         [Theory]
         [AutoMoqData]
-        public void Rename_ShouldCallUpdateMethod([Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
-            TaskService taskService)
-        {
-            taskModelDbOperationsMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new TaskModel(1, "test", false));
-
-            taskService.Rename(1, "newName");
-
-            taskModelDbOperationsMock.Verify(x => x.Update(It.Is<TaskModel>(y => y.Name == "newName")), Times.Once);
-        }
-
-        [Theory]
-        [AutoMoqData]
-        public void Rename_WhenValidationFailure_ShouldNotCallAddMethod(
+        public async Task Rename_ShouldCallUpdateMethodAsync(
             [Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
             [Frozen] Mock<IValidator<TaskModel>> taskModelValidatorMock,
             TaskService taskService)
         {
-            taskModelDbOperationsMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new TaskModel(1, "test", false));
-            var valResult = new ValidationResult(new List<ValidationFailure>
-            {
-                new ValidationFailure("Name", "aaa")
-            });
-            taskModelValidatorMock.Setup(x => x.Validate(It.IsAny<TaskModel>())).Returns(valResult);
+            taskModelValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<TaskModel>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
 
-            taskService.Rename(1, "test");
+            taskModelDbOperationsMock.Setup(x => x.GetAsync(It.IsAny<int>()))
+                .ReturnsAsync(new TaskModel(1, "test", false));
 
-            taskModelDbOperationsMock.Verify(x => x.Add(It.Is<TaskModel>(y => y.Name == "test")), Times.Never);
+            await taskService.RenameAsync(1, "newName");
+
+            taskModelDbOperationsMock.Verify(x => x.UpdateAsync(It.Is<TaskModel>(y => y.Name == "newName")),
+                Times.Once);
         }
 
         [Theory]
         [AutoMoqData]
-        public void MarkTaskAsOpened_ShouldCallUpdateMethod(
+        public async Task Rename_WhenValidationFailure_ShouldNotCallAddMethodAsync(
+            [Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
+            [Frozen] Mock<IValidator<TaskModel>> taskModelValidatorMock,
+            TaskService taskService)
+        {
+            taskModelDbOperationsMock.Setup(x => x.GetAsync(It.IsAny<int>()))
+                .ReturnsAsync(new TaskModel(1, "test", false));
+            var valResult = new ValidationResult(new List<ValidationFailure>
+            {
+                new ValidationFailure("Name", "aaa")
+            });
+            taskModelValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<TaskModel>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(valResult);
+
+            await taskService.RenameAsync(1, "test");
+
+            taskModelDbOperationsMock.Verify(x => x.AddAsync(It.Is<TaskModel>(y => y.Name == "test")), Times.Never);
+        }
+
+        [Theory]
+        [AutoMoqData]
+        public async Task MarkTaskAsOpened_ShouldCallUpdateMethodAsync(
             [Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
             TaskService taskService)
         {
-            taskModelDbOperationsMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new TaskModel(1, "test", false));
+            taskModelDbOperationsMock.Setup(x => x.GetAsync(It.IsAny<int>()))
+                .ReturnsAsync(new TaskModel(1, "test", false));
 
-            taskService.MarkTaskAsOpened(1);
+            await taskService.MarkTaskAsOpenedAsync(1);
 
             taskModelDbOperationsMock.Verify(
-                x => x.Update(It.Is<TaskModel>(y => y.Name == "test" && y.IsCompleted == false)), Times.Once);
+                x => x.UpdateAsync(It.Is<TaskModel>(y => y.Name == "test" && y.IsCompleted == false)), Times.Once);
         }
 
         [Theory]
         [AutoMoqData]
-        public void MarkTaskAsClosed_ShouldCallUpdateMethod(
+        public async Task MarkTaskAsClosed_ShouldCallUpdateMethodAsync(
             [Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
             TaskService taskService)
         {
-            taskModelDbOperationsMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new TaskModel(1, "test", false));
+            taskModelDbOperationsMock.Setup(x => x.GetAsync(It.IsAny<int>()))
+                .ReturnsAsync(new TaskModel(1, "test", false));
 
-            taskService.MarkTaskAsClosed(1);
+            await taskService.MarkTaskAsClosedAsync(1);
 
-            taskModelDbOperationsMock.Verify(x => x.Update(It.Is<TaskModel>(y => y.Name == "test" && y.IsCompleted)),
+            taskModelDbOperationsMock.Verify(
+                x => x.UpdateAsync(It.Is<TaskModel>(y => y.Name == "test" && y.IsCompleted)),
                 Times.Once);
         }
     }

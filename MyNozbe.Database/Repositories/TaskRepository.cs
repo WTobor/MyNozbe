@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using MyNozbe.Database.Mappers;
-using MyNozbe.Database.Models;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
 
@@ -15,27 +15,27 @@ namespace MyNozbe.Database.Repositories
             _databaseContext = databaseContext;
         }
 
-        public int Add(TaskModel model)
+        public async Task<int> AddAsync(TaskModel model)
         {
-            var task = new Task(model.Name, DateTimeOffset.Now, model.IsCompleted);
-            _databaseContext.Tasks.Add(task);
-            _databaseContext.SaveChanges();
+            var task = new Models.Task(model.Name, DateTimeOffset.Now, model.IsCompleted);
+            await _databaseContext.Tasks.AddAsync(task);
+            await _databaseContext.SaveChangesAsync();
             return task.Id;
         }
 
-        public TaskModel Get(int taskId)
+        public async Task<TaskModel> GetAsync(int taskId)
         {
-            var task = _databaseContext.Tasks.Find(taskId);
+            var task = await _databaseContext.Tasks.FindAsync(taskId);
             return TaskMapper.MapTaskToTaskModel(task);
         }
 
-        public void Update(TaskModel model)
+        public async Task UpdateAsync(TaskModel model)
         {
-            var task = _databaseContext.Tasks.Find(model.Id);
+            var task = await _databaseContext.Tasks.FindAsync(model.Id);
             task.Name = model.Name;
             task.IsCompleted = model.IsCompleted;
             task.ProjectId = model.ProjectId;
-            _databaseContext.SaveChanges();
+            await _databaseContext.SaveChangesAsync();
         }
     }
 }

@@ -1,11 +1,13 @@
-﻿namespace MyNozbe.Domain.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace MyNozbe.Domain.Interfaces
 {
-    public interface IDbOperations <T>
+    public interface IDbOperations<T>
     {
-        int Add(T model);
+        Task<int> AddAsync(T model);
 
-        void Update(T model);
+        Task UpdateAsync(T model);
 
-        T Get(int id);
+        Task<T> GetAsync(int id);
     }
 }
