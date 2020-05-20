@@ -230,6 +230,34 @@ namespace MyNozbe.API.E2ETests
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
+        [Theory]
+        [AutoData]
+        public async Task AssignTask_ShouldAssignTaskToProjectAsync(string projectName, [MaxLength(30)] string taskName)
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var taskId = await AddTestTaskAsync(taskName, client);
+            var projectId = await AddTestProjectAsync(projectName, client);
+            var url = $"task/{taskId}/assign/project/{projectId}";
+
+            // Act
+            var response = await client.PostAsync(url, null);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            var testResponse = await client.GetAsync($"task/{taskId}");
+
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(testResponse);
+            taskResult.ProjectId.Should().Be(projectId);
+        }
+
+        private static async Task<int> AddTestProjectAsync(string projectName, HttpClient client)
+        {
+            var url = $"project?name={projectName}";
+            var response = await client.PostAsync(url, null);
+            return await ResponseHelper.GetResult<int>(response);
+        }
+
         private static async Task<int> AddTestTaskAsync(string name, HttpClient client)
         {
             var url = $"task?name={name}";

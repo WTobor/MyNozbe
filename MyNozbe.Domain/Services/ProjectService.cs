@@ -35,18 +35,5 @@ namespace MyNozbe.Domain.Services
             _projectModelDbOperations.Update(project);
             return OperationResult<ProjectModel>.Ok();
         }
-
-        public OperationResult<ProjectModel> AssignTask(int projectId, int taskId)
-        {
-            var task = _taskModelDbOperations.Get(taskId);
-            if (task == null)
-            {
-                return OperationResult<ProjectModel>.NotFound();
-            }
-
-            task.AssignToProject(projectId);
-            _taskModelDbOperations.Update(task);
-            return OperationResult<ProjectModel>.Ok();
-        }
     }
 }

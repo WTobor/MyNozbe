@@ -57,14 +57,5 @@ namespace MyNozbe.API.Controllers
             var projectResult = _projectService.Rename(id, name);
             return ActionResultHelper<ProjectModel>.GetActionResult(projectResult, false);
         }
-
-        [HttpPost("{id}/assign/task/{taskId}")]
-        public ActionResult<ProjectModel> AssignTask(int id, int taskId)
-        {
-            var projectResult = _projectService.AssignTask(id, taskId);
-
-            var tmp = _databaseContext.Tasks.Include(i => i.Project).FirstOrDefault(f => f.Id == taskId);
-            return ActionResultHelper<ProjectModel>.GetActionResult(projectResult, false);
-        }
     }
 }

@@ -69,5 +69,13 @@ namespace MyNozbe.API.Controllers
             var taskResult = _taskService.MarkTaskAsOpened(id);
             return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
         }
+
+        [HttpPost("{id}/assign/project/{projectId}")]
+        public ActionResult<TaskModel> AssignTask(int id, int projectId)
+        {
+            var taskResult = _taskService.AssignProject(id, projectId);
+
+            return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
+        }
     }
 }

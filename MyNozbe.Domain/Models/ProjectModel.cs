@@ -20,7 +20,7 @@ namespace MyNozbe.Domain.Models
 
         public string Name { get; private set; }
 
-        public ICollection<TaskModel> TaskModels { get; private set; }
+        public ICollection<TaskModel> TaskModels { get; }
 
         public void Rename(string name)
         {

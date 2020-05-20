@@ -77,6 +77,18 @@ namespace MyNozbe.Domain.Services
             return OperationResult<TaskModel>.Ok();
         }
 
+        public OperationResult<TaskModel> AssignProject(int taskId, int projectId)
+        {
+            var taskModel = _taskModelDbOperations.Get(taskId);
+            if (taskModel == null)
+            {
+                return OperationResult<TaskModel>.NotFound();
+            }
+            taskModel.AssignToProject(projectId);
+            _taskModelDbOperations.Update(taskModel);
+            return OperationResult<TaskModel>.Ok();
+        }
+
         private static OperationResult<T> GetValidationFailedOperationResult<T>(ValidationResult result)
         {
             var validationErrors = GetValidationErrorMessage(result.Errors);

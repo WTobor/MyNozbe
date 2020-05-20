@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -96,38 +95,9 @@ namespace MyNozbe.API.E2ETests
             projectResult.Name.Should().Be(newProjectName);
         }
 
-        [Theory]
-        [AutoData]
-        public async Task AssignTask_ShouldAssignTaskToProjectAsync(string projectName, [MaxLength(30)] string taskName)
-        {
-            // Arrange
-            var client = _factory.CreateClient();
-            var taskId = await AddTestTaskAsync(taskName, client);
-            var projectId = await AddTestProjectAsync(projectName, client);
-            var url = $"project/{projectId}/assign/task/{taskId}";
-
-            // Act
-            var response = await client.PostAsync(url, null);
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-            var projectResponse = await client.GetAsync($"project/{projectId}");
-
-            var projectResult = await ResponseHelper.GetResult<ProjectTestModel>(projectResponse);
-            projectResult.Tasks.Should().Contain(x => x.Id == taskId);
-        }
-
-
         private static async Task<int> AddTestProjectAsync(string name, HttpClient client)
         {
             var url = $"project?name={name}";
-            var response = await client.PostAsync(url, null);
-            return await ResponseHelper.GetResult<int>(response);
-        }
-
-        private static async Task<int> AddTestTaskAsync(string name, HttpClient client)
-        {
-            var url = $"task?name={name}";
             var response = await client.PostAsync(url, null);
             return await ResponseHelper.GetResult<int>(response);
         }
