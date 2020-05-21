@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentValidation;
-using FluentValidation.Results;
 using MyNozbe.Domain.Interfaces;
 using MyNozbe.Domain.Models;
 
@@ -22,10 +19,10 @@ namespace MyNozbe.Domain.Services
         public async Task<OperationResult<int>> AddTaskAsync(string name)
         {
             var taskModel = new TaskModel(name);
-            var result = await _taskModelValidator.ValidateAsync(taskModel);
-            if (!result.IsValid)
+            var validationResult = await _taskModelValidator.ValidateAsync(taskModel);
+            if (!validationResult.IsValid)
             {
-                return GetValidationFailedOperationResult<int>(result);
+                return ValidationHelper.GetValidationFailedOperationResult<int>(validationResult);
             }
 
             var taskId = await _taskModelDbOperations.AddAsync(taskModel);
@@ -68,10 +65,10 @@ namespace MyNozbe.Domain.Services
 
             taskModel.Rename(name);
 
-            var result = await _taskModelValidator.ValidateAsync(taskModel);
-            if (!result.IsValid)
+            var validationResult = await _taskModelValidator.ValidateAsync(taskModel);
+            if (!validationResult.IsValid)
             {
-                return GetValidationFailedOperationResult<TaskModel>(result);
+                return ValidationHelper.GetValidationFailedOperationResult<TaskModel>(validationResult);
             }
 
             await _taskModelDbOperations.UpdateAsync(taskModel);
@@ -89,17 +86,6 @@ namespace MyNozbe.Domain.Services
             taskModel.AssignToProject(projectId);
             await _taskModelDbOperations.UpdateAsync(taskModel);
             return OperationResult<TaskModel>.Ok();
-        }
-
-        private static OperationResult<T> GetValidationFailedOperationResult<T>(ValidationResult result)
-        {
-            var validationErrors = GetValidationErrorMessage(result.Errors);
-            return OperationResult<T>.ValidationFailed(validationErrors);
-        }
-
-        private static string GetValidationErrorMessage(IEnumerable<ValidationFailure> errors)
-        {
-            return string.Join(";", errors.Select(x => x.ErrorMessage));
         }
     }
 }

@@ -40,7 +40,11 @@ namespace MyNozbe.API
             services.AddControllers()
                 //solution based on https://dotnetcoretutorials.com/2020/03/15/fixing-json-self-referencing-loop-exceptions/
                 .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<TaskModelValidator>());
+                .AddFluentValidation(fv =>
+                {
+                    fv.RegisterValidatorsFromAssemblyContaining<TaskModelValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<ProjectModelValidator>();
+                });
 
             services.AddSwaggerGen(c =>
             {

@@ -232,7 +232,7 @@ namespace MyNozbe.API.E2ETests
 
         [Theory]
         [AutoData]
-        public async Task AssignTask_ShouldAssignTaskToProjectAsync(string projectName, [MaxLength(30)] string taskName)
+        public async Task AssignTask_ShouldAssignTaskToProjectAsync([MaxLength(20)] string projectName, [MaxLength(30)] string taskName)
         {
             // Arrange
             var client = _factory.CreateClient();
