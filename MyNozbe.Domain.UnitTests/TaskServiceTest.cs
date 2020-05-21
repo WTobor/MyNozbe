@@ -119,5 +119,24 @@ namespace MyNozbe.Domain.UnitTests
                 x => x.UpdateAsync(It.Is<TaskModel>(y => y.Name == "test" && y.IsCompleted)),
                 Times.Once);
         }
+
+        [Theory]
+        [AutoMoqData]
+        public async Task AssignProject_ShouldCallUpdateMethodAsync(
+            [Frozen] Mock<IDbOperations<TaskModel>> taskModelDbOperationsMock,
+            [Frozen] Mock<IValidator<TaskModel>> taskModelValidatorMock,
+            TaskService taskService)
+        {
+            taskModelValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<TaskModel>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            taskModelDbOperationsMock.Setup(x => x.GetAsync(It.IsAny<int>()))
+                .ReturnsAsync(new TaskModel(1, "test", false));
+
+            await taskService.AssignProjectAsync(1, 1);
+
+            taskModelDbOperationsMock.Verify(x => x.UpdateAsync(It.Is<TaskModel>(y => y.Id == 1 && y.ProjectId == 1)),
+                Times.Once);
+        }
     }
 }
