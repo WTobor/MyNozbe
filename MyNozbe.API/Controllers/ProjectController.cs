@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using MyNozbe.Database;
 using MyNozbe.Database.Models;
 using MyNozbe.Domain.Models;
 using MyNozbe.Domain.Services;
+using Z.EntityFramework.Plus;
 using Task = MyNozbe.Database.Models.Task;
 
 namespace MyNozbe.API.Controllers
@@ -30,13 +32,16 @@ namespace MyNozbe.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Project>>> GetAllAsync()
         {
-            return Ok(await _databaseContext.Projects.Include(x => x.Tasks).ToListAsync());
+            return Ok(await _databaseContext.Projects.ToListAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Task>> GetAsync(int id)
         {
-            var project = await _databaseContext.Projects.Include(x => x.Tasks).FirstOrDefaultAsync(f => f.Id == id);
+            var project = await _databaseContext.Projects
+                .IncludeFilter(x => x.Tasks.Where(p => !p.IsCompleted))
+                .FirstOrDefaultAsync(f => f.Id == id);
+            
             if (project == null)
             {
                 return NotFound();

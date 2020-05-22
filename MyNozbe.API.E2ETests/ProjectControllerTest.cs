@@ -55,7 +55,8 @@ namespace MyNozbe.API.E2ETests
 
         [Theory]
         [AutoData]
-        public async Task GetAll_ShouldReturnAddedProjectsAsync([MaxLength(20)] string project1Name, [MaxLength(20)] string project2Name)
+        public async Task GetAll_ShouldReturnAddedProjectsAsync([MaxLength(20)] string project1Name,
+            [MaxLength(20)] string project2Name)
         {
             // Arrange
             var url = "project";
@@ -93,7 +94,30 @@ namespace MyNozbe.API.E2ETests
 
         [Theory]
         [AutoData]
-        public async Task Rename_ShouldChangeNameToNewOneAsync([MaxLength(20)] string projectName, [MaxLength(20)] string newProjectName)
+        public async Task Get_ShouldReturnProjectWithoutCompletedTasksAsync([MaxLength(20)] string projectName)
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var projectId = await AddTestProjectAsync(projectName, client);
+            var url = $"project/{projectId}";
+            var task1Id = await AddTestTaskToProjectAsync("task1", projectId, client);
+            await AddTestTaskToProjectAsync("task2", projectId, client);
+            await MarkTaskClosed(task1Id, client);
+
+            // Act
+            var response = await client.GetAsync(url);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var projectResult = await ResponseHelper.GetResult<ProjectTestModel>(response);
+            projectResult.Id.Should().Be(projectId);
+            projectResult.Tasks.Count.Should().Be(1);
+        }
+
+        [Theory]
+        [AutoData]
+        public async Task Rename_ShouldChangeNameToNewOneAsync([MaxLength(20)] string projectName,
+            [MaxLength(20)] string newProjectName)
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -114,7 +138,8 @@ namespace MyNozbe.API.E2ETests
 
         [Theory]
         [AutoData]
-        public async Task Rename_WhenTooLongName_ShouldReturnBadRequestAsync([MaxLength(20)] string projectName, [MinLength(31)] string newProjectName)
+        public async Task Rename_WhenTooLongName_ShouldReturnBadRequestAsync([MaxLength(20)] string projectName,
+            [MinLength(31)] string newProjectName)
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -133,6 +158,27 @@ namespace MyNozbe.API.E2ETests
             var url = $"project?name={name}";
             var response = await client.PostAsync(url, null);
             return await ResponseHelper.GetResult<int>(response);
+        }
+
+        private static async Task<int> AddTestTaskToProjectAsync(string taskName, int projectId, HttpClient client)
+        {
+            var taskId = await AddTestTaskAsync(taskName, client);
+            var url = $"task/{taskId}/assign/project/{projectId}";
+            await client.PostAsync(url, null);
+            return taskId;
+        }
+
+        private static async Task<int> AddTestTaskAsync(string taskName, HttpClient client)
+        {
+            var url = $"task?name={taskName}";
+            var response = await client.PostAsync(url, null);
+            return await ResponseHelper.GetResult<int>(response);
+        }
+
+        private static async Task MarkTaskClosed(int taskId, HttpClient client)
+        {
+            var url = $"task/{taskId}/close";
+            await client.PutAsync(url, null);
         }
     }
 }
