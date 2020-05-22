@@ -232,7 +232,7 @@ namespace MyNozbe.API.E2ETests
 
         [Theory]
         [AutoData]
-        public async Task AssignTask_ShouldAssignTaskToProjectAsync([MaxLength(20)] string projectName, [MaxLength(30)] string taskName)
+        public async Task AssignProject_ShouldAssignTaskToProjectAsync([MaxLength(20)] string projectName, [MaxLength(30)] string taskName)
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -249,6 +249,26 @@ namespace MyNozbe.API.E2ETests
 
             var taskResult = await ResponseHelper.GetResult<TaskTestModel>(testResponse);
             taskResult.ProjectId.Should().Be(projectId);
+        }
+
+        [Theory]
+        [AutoData]
+        public async Task AddComment_ShouldAddCommentToTaskAsync([MaxLength(30)] string taskName)
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var taskId = await AddTestTaskAsync(taskName, client);
+            var url = $"task/{taskId}/comment/testComment";
+
+            // Act
+            var response = await client.PostAsync(url, null);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            var testResponse = await client.GetAsync($"task/{taskId}");
+
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(testResponse);
+            taskResult.Comments.Count.Should().Be(1);
         }
 
         private static async Task<int> AddTestProjectAsync(string projectName, HttpClient client)

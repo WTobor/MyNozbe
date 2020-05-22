@@ -13,9 +13,13 @@ namespace MyNozbe.Database
 
         public DbSet<Project> Projects { get; set; }
 
+        public DbSet<Comment> Comments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Project>().HasMany(p => p.Tasks).WithOne(t => t.Project);
+            modelBuilder.Entity<Task>().HasMany(t => t.Comments).WithOne(c => c.Task);
+            
             base.OnModelCreating(modelBuilder);
         }
     }

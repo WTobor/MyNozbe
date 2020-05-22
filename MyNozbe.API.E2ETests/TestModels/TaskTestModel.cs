@@ -1,4 +1,6 @@
-﻿namespace MyNozbe.API.E2ETests.TestModels
+﻿using System.Collections.Generic;
+
+namespace MyNozbe.API.E2ETests.TestModels
 {
     public class TaskTestModel
     {
@@ -9,5 +11,7 @@
         public bool IsCompleted { get; set; }
         
         public int? ProjectId { get; set; }
+
+        public ICollection<CommentModel> Comments { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyNozbe.Database.Models
@@ -27,5 +28,7 @@ namespace MyNozbe.Database.Models
         public int? ProjectId { get; set; }
 
         public virtual Project Project { get; set; }
+
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }

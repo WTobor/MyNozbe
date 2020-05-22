@@ -14,15 +14,18 @@ namespace MyNozbe.API.Controllers
     [Route("[controller]")]
     public class TaskController : ControllerBase
     {
+        private readonly CommentService _commentService;
         private readonly DatabaseContext _databaseContext;
         private readonly ILogger<TaskController> _logger;
         private readonly TaskService _taskService;
 
-        public TaskController(ILogger<TaskController> logger, DatabaseContext databaseContext, TaskService taskService)
+        public TaskController(ILogger<TaskController> logger, DatabaseContext databaseContext, TaskService taskService,
+            CommentService commentService)
         {
             _logger = logger;
             _databaseContext = databaseContext;
             _taskService = taskService;
+            _commentService = commentService;
         }
 
         [HttpGet]
@@ -34,7 +37,10 @@ namespace MyNozbe.API.Controllers
         [HttpGet("{id}")]
         public async System.Threading.Tasks.Task<ActionResult<Task>> GetAsync(int id)
         {
-            var task = await _databaseContext.Tasks.FindAsync(id);
+            var task = await _databaseContext.Tasks
+                .Include(x => x.Comments)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (task == null)
             {
                 return NotFound();
@@ -72,11 +78,19 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpPost("{id}/assign/project/{projectId}")]
-        public async Task<ActionResult<TaskModel>> AssignTaskAsync(int id, int projectId)
+        public async Task<ActionResult<TaskModel>> AssignProjectAsync(int id, int projectId)
         {
             var taskResult = await _taskService.AssignProjectAsync(id, projectId);
 
             return ActionResultHelper<TaskModel>.GetActionResult(taskResult, false);
+        }
+
+        [HttpPost("{id}/comment/{content}")]
+        public async Task<ActionResult<CommentModel>> AddCommentAsync(int id, string content)
+        {
+            var commentResult = await _commentService.AddCommentAsync(id, content);
+
+            return ActionResultHelper<CommentModel>.GetActionResult(commentResult, false);
         }
     }
 }

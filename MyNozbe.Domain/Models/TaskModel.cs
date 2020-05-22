@@ -1,4 +1,7 @@
-﻿namespace MyNozbe.Domain.Models
+﻿using System.Collections;
+using System.Collections.Generic;
+
+namespace MyNozbe.Domain.Models
 {
     public class TaskModel
     {
@@ -22,6 +25,8 @@
         public bool IsCompleted { get; private set; }
 
         public int? ProjectId { get; private set; }
+
+        public ICollection<string> Comments { get; private set; }
 
         public void MarkAsOpened()
         {

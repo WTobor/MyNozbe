@@ -32,8 +32,10 @@ namespace MyNozbe.API
                     options.UseInMemoryDatabase("myNozbeDatabase"));
 
             services.AddScoped<DatabaseContext>();
+            services.AddScoped<IDbOperations<CommentModel>, CommentRepository>();
             services.AddScoped<IDbOperations<TaskModel>, TaskRepository>();
             services.AddScoped<IDbOperations<ProjectModel>, ProjectRepository>();
+            services.AddScoped<CommentService>();
             services.AddScoped<TaskService>();
             services.AddScoped<ProjectService>();
 
