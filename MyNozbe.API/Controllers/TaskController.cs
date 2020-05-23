@@ -29,13 +29,13 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpGet]
-        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<Task>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<Task>>> GetAllAsync()
         {
             return Ok(await _databaseContext.Tasks.ToListAsync());
         }
 
         [HttpGet("{id}")]
-        public async System.Threading.Tasks.Task<ActionResult<Task>> GetAsync(int id)
+        public async Task<ActionResult<Task>> GetAsync(int id)
         {
             var task = await _databaseContext.Tasks
                 .Include(x => x.Comments)
