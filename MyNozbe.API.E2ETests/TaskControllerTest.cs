@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -232,7 +233,8 @@ namespace MyNozbe.API.E2ETests
 
         [Theory]
         [AutoData]
-        public async Task AssignProject_ShouldAssignTaskToProjectAsync([MaxLength(20)] string projectName, [MaxLength(30)] string taskName)
+        public async Task AssignProject_ShouldAssignTaskToProjectAsync([MaxLength(20)] string projectName,
+            [MaxLength(30)] string taskName)
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -264,11 +266,34 @@ namespace MyNozbe.API.E2ETests
             var response = await client.PostAsync(url, null);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var commentId = await ResponseHelper.GetResult<int>(response);
             var testResponse = await client.GetAsync($"task/{taskId}");
 
             var taskResult = await ResponseHelper.GetResult<TaskTestModel>(testResponse);
             taskResult.Comments.Count.Should().Be(1);
+            taskResult.Comments.First().Id.Should().Be(commentId);
+        }
+
+        [Theory]
+        [AutoData]
+        public async Task UpdateComment_ShouldUpdateCommentContentAsync([MaxLength(30)] string taskName)
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var taskId = await AddTestTaskAsync(taskName, client);
+            var commentId = await AddTestCommentAsync(taskId, "testComment", client);
+            var url = $"task/{taskId}/comment/{commentId}/newTestComment";
+
+            // Act
+            var response = await client.PostAsync(url, null);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            var testResponse = await client.GetAsync($"task/{taskId}");
+
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(testResponse);
+            taskResult.Comments.First().Content.Should().Be("newTestComment");
         }
 
         private static async Task<int> AddTestProjectAsync(string projectName, HttpClient client)
@@ -281,6 +306,13 @@ namespace MyNozbe.API.E2ETests
         private static async Task<int> AddTestTaskAsync(string name, HttpClient client)
         {
             var url = $"task?name={name}";
+            var response = await client.PostAsync(url, null);
+            return await ResponseHelper.GetResult<int>(response);
+        }
+
+        private static async Task<int> AddTestCommentAsync(int taskId, string content, HttpClient client)
+        {
+            var url = $"task/{taskId}/comment/testComment";
             var response = await client.PostAsync(url, null);
             return await ResponseHelper.GetResult<int>(response);
         }

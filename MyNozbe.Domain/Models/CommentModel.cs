@@ -8,6 +8,13 @@
             Content = content;
         }
 
+        public CommentModel(int id, int taskId, string content)
+        {
+            Id = id;
+            TaskId = taskId;
+            Content = content;
+        }
+
         public int Id { get; set; }
 
         public string Content { get; set; }

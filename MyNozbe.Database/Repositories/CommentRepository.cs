@@ -27,7 +27,7 @@ namespace MyNozbe.Database.Repositories
         public async Task<CommentModel> GetAsync(int id)
         {
             var comment = await _databaseContext.Comments.FindAsync(id);
-            return new CommentModel(comment.TaskId, comment.Content);
+            return new CommentModel(comment.Id, comment.TaskId, comment.Content);
         }
 
         public async Task UpdateAsync(CommentModel model)

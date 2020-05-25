@@ -86,9 +86,17 @@ namespace MyNozbe.API.Controllers
         }
 
         [HttpPost("{id}/comment/{content}")]
-        public async Task<ActionResult<CommentModel>> AddCommentAsync(int id, string content)
+        public async Task<ActionResult<int>> AddCommentAsync(int id, string content)
         {
             var commentResult = await _commentService.AddCommentAsync(id, content);
+
+            return ActionResultHelper<int>.GetActionResult(commentResult);
+        }
+
+        [HttpPost("{taskId}/comment/{commentId}/{content}")]
+        public async Task<ActionResult<CommentModel>> EditCommentAsync(int commentId, string content)
+        {
+            var commentResult = await _commentService.UpdateCommentAsync(commentId, content);
 
             return ActionResultHelper<CommentModel>.GetActionResult(commentResult, false);
         }
