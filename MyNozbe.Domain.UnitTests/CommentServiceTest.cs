@@ -23,5 +23,25 @@ namespace MyNozbe.Domain.UnitTests
                     y.TaskId == 1 && y.Content =="testContent")),
                 Times.Once);
         }
+
+        [Theory]
+        [AutoMoqData]
+        public async Task UpdateComment_ShouldCallUpdateMethodAsync(
+            Mock<IDbOperations<TaskModel>> taskModelDbOperationMock,
+            [Frozen] Mock<IDbOperations<CommentModel>> commentModelDbOperationsMock,
+            CommentService commentService)
+        {
+            taskModelDbOperationMock.Setup(x => x.GetAsync(It.IsAny<int>()))
+                .ReturnsAsync(new TaskModel(1, "testTask", false));
+            commentModelDbOperationsMock.Setup(x => x.GetAsync(It.IsAny<int>()))
+                .ReturnsAsync(new CommentModel(1, 1, "testContent"));
+
+            var commentResult = await commentService.UpdateCommentAsync(1, "newTestContent");
+
+            commentModelDbOperationsMock.Verify(
+                x => x.UpdateAsync(It.Is<CommentModel>(y =>
+                    y.TaskId == 1 && y.Content == "newTestContent")),
+                Times.Once);
+        }
     }
 }
