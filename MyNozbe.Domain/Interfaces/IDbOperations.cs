@@ -9,5 +9,7 @@ namespace MyNozbe.Domain.Interfaces
         Task UpdateAsync(T model);
 
         Task<T> GetAsync(int id);
+
+        Task DeleteAsync(T model);
     }
 }

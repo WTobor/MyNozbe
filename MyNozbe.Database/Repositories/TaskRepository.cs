@@ -44,5 +44,12 @@ namespace MyNozbe.Database.Repositories
 
             await _databaseContext.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(TaskModel model)
+        {
+            var task = await _databaseContext.Tasks.FindAsync(model.Id);
+            _databaseContext.Tasks.Remove(task);
+            await _databaseContext.SaveChangesAsync();
+        }
     }
 }

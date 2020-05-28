@@ -36,5 +36,12 @@ namespace MyNozbe.Database.Repositories
             comment.Content = model.Content;
             await _databaseContext.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(CommentModel model)
+        {
+            var comment = await _databaseContext.Comments.FindAsync(model.Id);
+            _databaseContext.Comments.Remove(comment);
+            await _databaseContext.SaveChangesAsync();
+        }
     }
 }

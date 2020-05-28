@@ -51,5 +51,12 @@ namespace MyNozbe.Database.Repositories
 
             return new ProjectModel(project.Id, project.Name, tasks);
         }
+
+        public async Task DeleteAsync(ProjectModel model)
+        {
+            var project = await _databaseContext.Projects.FindAsync(model.Id);
+            _databaseContext.Projects.Remove(project);
+            await _databaseContext.SaveChangesAsync();
+        }
     }
 }
