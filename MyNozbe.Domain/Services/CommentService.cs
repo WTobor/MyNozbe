@@ -33,5 +33,17 @@ namespace MyNozbe.Domain.Services
             await _commentModelDbOperations.UpdateAsync(comment);
             return OperationResult<CommentModel>.Ok();
         }
+
+        public async Task<OperationResult<CommentModel>> DeleteCommentAsync(int commentId)
+        {
+            var comment = await _commentModelDbOperations.GetAsync(commentId);
+            if (comment == null)
+            {
+                return OperationResult<CommentModel>.NotFound();
+            }
+
+            await _commentModelDbOperations.DeleteAsync(comment);
+            return OperationResult<CommentModel>.Ok();
+        }
     }
 }

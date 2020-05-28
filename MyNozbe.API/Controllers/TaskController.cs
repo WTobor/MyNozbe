@@ -93,10 +93,18 @@ namespace MyNozbe.API.Controllers
             return ActionResultHelper<int>.GetActionResult(commentResult);
         }
 
-        [HttpPost("{taskId}/comment/{commentId}/{content}")]
+        [HttpPost("{taskId}/update/comment/{commentId}/{content}")]
         public async Task<ActionResult<CommentModel>> EditCommentAsync(int commentId, string content)
         {
             var commentResult = await _commentService.UpdateCommentAsync(commentId, content);
+
+            return ActionResultHelper<CommentModel>.GetActionResult(commentResult, false);
+        }
+
+        [HttpDelete("{taskId}/delete/comment/{commentId}/")]
+        public async Task<ActionResult<CommentModel>> DeleteCommentAsync(int commentId)
+        {
+            var commentResult = await _commentService.DeleteCommentAsync(commentId);
 
             return ActionResultHelper<CommentModel>.GetActionResult(commentResult, false);
         }

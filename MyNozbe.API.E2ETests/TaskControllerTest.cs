@@ -283,7 +283,7 @@ namespace MyNozbe.API.E2ETests
             var client = _factory.CreateClient();
             var taskId = await AddTestTaskAsync(taskName, client);
             var commentId = await AddTestCommentAsync(taskId, "testComment", client);
-            var url = $"task/{taskId}/comment/{commentId}/newTestComment";
+            var url = $"task/{taskId}/update/comment/{commentId}/newTestComment";
 
             // Act
             var response = await client.PostAsync(url, null);
@@ -294,6 +294,27 @@ namespace MyNozbe.API.E2ETests
 
             var taskResult = await ResponseHelper.GetResult<TaskTestModel>(testResponse);
             taskResult.Comments.First().Content.Should().Be("newTestComment");
+        }
+
+        [Theory]
+        [AutoData]
+        public async Task DeleteComment_ShouldDeleteCommentAsync([MaxLength(30)] string taskName)
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var taskId = await AddTestTaskAsync(taskName, client);
+            var commentId = await AddTestCommentAsync(taskId, "testComment", client);
+            var url = $"task/{taskId}/delete/comment/{commentId}";
+
+            // Act
+            var response = await client.DeleteAsync(url);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            var testResponse = await client.GetAsync($"task/{taskId}");
+
+            var taskResult = await ResponseHelper.GetResult<TaskTestModel>(testResponse);
+            taskResult.Comments.Count.Should().Be(0);
         }
 
         private static async Task<int> AddTestProjectAsync(string projectName, HttpClient client)
